@@ -128,9 +128,9 @@ export default function AdminProductsPage() {
                                         {product.precio ? `$${product.precio.toLocaleString()}` : 'Consultar'}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${product.tipo === 'stock' ? 'bg-green-100 text-green-700' :
-                                                product.tipo === 'pedido' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-purple-100 text-purple-700'
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${product.tipo === 'STOCK' ? 'bg-green-100 text-green-700' :
+                                            product.tipo === 'PEDIDO' ? 'bg-blue-100 text-blue-700' :
+                                                'bg-purple-100 text-purple-700'
                                             }`}>
                                             {product.tipo.toUpperCase()}
                                         </span>

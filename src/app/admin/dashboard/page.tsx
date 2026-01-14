@@ -57,14 +57,14 @@ export default function AdminDashboard() {
                                                 <span className="font-bold text-gray-900">{product.nombre}</span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6 text-sm font-medium text-gray-600">{product.categoria}</td>
+                                        <td className="px-8 py-6 text-sm font-medium text-gray-600">{product.category?.nombre || 'Sin categoría'}</td>
                                         <td className="px-8 py-6 text-sm font-bold text-gray-900">
                                             {product.precio ? `$${product.precio.toLocaleString('es-AR')}` : '-'}
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className={`text-[10px] font-black uppercase tracking-tighter px-3 py-1 rounded-full ${product.tipo === 'STOCK' ? 'bg-green-100 text-green-700' :
-                                                    product.tipo === 'PEDIDO' ? 'bg-purple-100 text-purple-700' :
-                                                        'bg-rose-100 text-coral'
+                                                product.tipo === 'PEDIDO' ? 'bg-purple-100 text-purple-700' :
+                                                    'bg-rose-100 text-coral'
                                                 }`}>
                                                 {product.tipo}
                                             </span>
