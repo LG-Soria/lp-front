@@ -4,12 +4,14 @@ import React from 'react';
  * Colores: st0 -> #e9bbff (Lila suave), st1 -> #f89eb6 (Rosa vibrante)
  */
 export const WavyCheckerboardBackground: React.FC = () => (
-  <div className="fixed inset-0 -z-5 overflow-hidden pointer-events-none">
+  <div className="fixed inset-0 min-w-screen min-h-screen z-[-1] overflow-hidden pointer-events-none">
     <svg
       id="Layer_1"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 4100 4100"
-      className="w-full h-full object-cover opacity-100"
+      width="100%"
+      height="100%"
+      className="w-full h-full object-cover"
       preserveAspectRatio="xMidYMid slice"
     >
       <path fill="#e9bbff" d="M1348.3,0c39.72,79.06,75.13,154.69,106.57,227.22-155.76-9.32-314.76-18.44-478.14-26.23C948,136.21,916.01,69.3,880.5,0,1036.43,0,1192.37,0,1348.3,0Z" />
