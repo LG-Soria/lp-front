@@ -1,0 +1,10 @@
+export { StarDoodle } from './StarDoodle';
+export { SpeechBubble } from './SpeechBubble';
+export { GlassesDoodle } from './GlassesDoodle';
+export { ShoppingBagDoodle } from './ShoppingBagDoodle';
+export { SmileyFlowerDoodle } from './SmileyFlowerDoodle';
+export { HeartDoodle } from './HeartDoodle';
+export { TapeDoodle } from './TapeDoodle';
+export { StickerDoodle } from './StickerDoodle';
+export { WavyLine } from './WavyLine';
+export { StitchDivider } from './StitchDivider';
