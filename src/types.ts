@@ -8,6 +8,8 @@ export enum ProductType {
 export interface Category {
   id: string;
   nombre: string;
+  imageUrl?: string | null;
+  color?: string | null;
   _count?: {
     products: number;
   };
@@ -19,6 +21,7 @@ export interface Product {
   descripcion: string | null;
   precio: number | null;
   tipo: ProductType;
+  label?: string | null;
   imagenes: string[];
   tiempoProduccion: string | null;
   personalizable: boolean;

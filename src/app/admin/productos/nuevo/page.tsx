@@ -16,6 +16,7 @@ export default function ProductFormPage() {
         descripcion: '',
         precio: '',
         tipo: ProductType.STOCK,
+        label: '',
         categoryId: '',
         tiempoProduccion: '',
         personalizable: false,
@@ -48,6 +49,7 @@ export default function ProductFormPage() {
                     descripcion: product.descripcion || '',
                     precio: product.precio?.toString() || '',
                     tipo: product.tipo,
+                    label: product.label || '',
                     categoryId: product.categoryId,
                     tiempoProduccion: product.tiempoProduccion || '',
                     personalizable: product.personalizable,
@@ -158,6 +160,20 @@ export default function ProductFormPage() {
                             <option value={ProductType.STOCK}>En Stock</option>
                             <option value={ProductType.PEDIDO}>A Pedido</option>
                             <option value={ProductType.PERSONALIZADO}>Personalizado</option>
+                        </select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">Etiqueta Promocional</label>
+                        <select
+                            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-pink-500 outline-none"
+                            value={formData.label}
+                            onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                        >
+                            <option value="">Ninguna</option>
+                            <option value="Best Seller">Best Seller</option>
+                            <option value="Hecho Hoy">Hecho Hoy</option>
+                            <option value="Favorito de la Casa">Favorito de la Casa</option>
                         </select>
                     </div>
                 </div>

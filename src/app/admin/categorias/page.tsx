@@ -10,6 +10,16 @@ export default function AdminCategoriesPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Modal state
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const [editForm, setEditForm] = useState({
+        nombre: '',
+        imageUrl: '',
+        color: '#FF69B4'
+    });
+    const [isUploading, setIsUploading] = useState(false);
+
     useEffect(() => {
         loadCategories();
     }, []);
@@ -39,6 +49,48 @@ export default function AdminCategoriesPage() {
             alert('Error al crear la categoría. Probablemente ya existe.');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const openEditModal = (category: Category) => {
+        setEditingCategory(category);
+        setEditForm({
+            nombre: category.nombre,
+            imageUrl: category.imageUrl || '',
+            color: category.color || '#FF69B4'
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingCategory) return;
+
+        setIsSubmitting(true);
+        try {
+            const updated = await apiService.updateCategory(editingCategory.id, editForm);
+            setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, ...updated } : c));
+            setIsEditModalOpen(false);
+        } catch (error) {
+            alert('Error al actualizar la categoría');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const { uploadUrl, publicUrl } = await apiService.getPresignedUrl(file.name, file.type);
+            await apiService.uploadFileToR2(uploadUrl, file);
+            setEditForm({ ...editForm, imageUrl: publicUrl });
+        } catch (error) {
+            alert('Error al subir la imagen');
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -118,12 +170,20 @@ export default function AdminCategoriesPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => handleDelete(category.id, category._count?.products || 0)}
-                                            className="text-red-600 hover:text-red-800 font-medium text-sm"
-                                        >
-                                            Eliminar
-                                        </button>
+                                        <div className="flex justify-end gap-3">
+                                            <button
+                                                onClick={() => openEditModal(category)}
+                                                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(category.id, category._count?.products || 0)}
+                                                className="text-red-600 hover:text-red-800 font-medium text-sm"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -131,6 +191,76 @@ export default function AdminCategoriesPage() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Modal de Edición */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                        <h2 className="text-xl font-bold mb-4">Editar Categoría</h2>
+                        <form onSubmit={handleUpdate} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold mb-1">Nombre</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2 border rounded-md"
+                                    value={editForm.nombre}
+                                    onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold mb-1">Color de Etiqueta</label>
+                                <div className="flex gap-2 items-center">
+                                    <input
+                                        type="color"
+                                        className="h-10 w-20 border rounded cursor-pointer"
+                                        value={editForm.color}
+                                        onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                                    />
+                                    <span className="text-sm font-mono">{editForm.color}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold mb-1">Imagen de Portada</label>
+                                <div className="space-y-2">
+                                    {editForm.imageUrl && (
+                                        <img src={editForm.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md" />
+                                    )}
+                                    <div className="flex items-center justify-center w-full">
+                                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                                </svg>
+                                                <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">{isUploading ? 'Subiendo...' : 'Haz clic para subir'}</span></p>
+                                            </div>
+                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading} />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEditModalOpen(false)}
+                                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting || isUploading}
+                                    className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 disabled:opacity-50"
+                                >
+                                    {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

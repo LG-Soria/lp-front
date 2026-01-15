@@ -2,9 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { apiService } from '@/services/apiService';
-import { Product, Category } from '@/types';
+import { Product, Category, ProductType } from '@/types';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+
+const PRODUCT_LABELS = [
+    { value: '', label: 'Sin etiqueta' },
+    { value: 'Best Seller', label: 'Best Seller' },
+    { value: 'Hecho Hoy', label: 'Hecho Hoy' },
+    { value: 'Favorito de la Casa', label: 'Favorito de la Casa' },
+];
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -13,6 +20,11 @@ export default function AdminProductsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todas');
     const { token } = useAuth();
+
+    // In-place editing state
+    const [editingProductId, setEditingProductId] = useState<string | null>(null);
+    const [editFormData, setEditFormData] = useState<Partial<Product>>({});
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -42,6 +54,53 @@ export default function AdminProductsPage() {
             setProducts(products.filter(p => p.id !== id));
         } catch (error) {
             alert('Error al eliminar el producto');
+        }
+    };
+
+    const startEdit = (product: Product) => {
+        setEditingProductId(product.id);
+        setEditFormData({ ...product });
+    };
+
+    const cancelEdit = () => {
+        setEditingProductId(null);
+        setEditFormData({});
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingProductId) return;
+        setIsSaving(true);
+        try {
+            const updated = await apiService.updateProduct(editingProductId, editFormData);
+            setProducts(products.map(p => p.id === editingProductId ? updated : p));
+            setEditingProductId(null);
+            setEditFormData({});
+        } catch (error) {
+            alert('Error al actualizar el producto');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleImageUpdate = async (productId: string, file: File) => {
+        try {
+            const { uploadUrl, publicUrl } = await apiService.getPresignedUrl(file.name, file.type);
+            await apiService.uploadFileToR2(uploadUrl, file);
+
+            if (editingProductId === productId) {
+                setEditFormData(prev => ({ ...prev, imagenes: [publicUrl, ...(prev.imagenes?.slice(1) || [])] }));
+            } else {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    const updated = await apiService.updateProduct(productId, {
+                        imagenes: [publicUrl, ...product.imagenes.slice(1)]
+                    });
+                    setProducts(products.map(p => p.id === productId ? updated : p));
+                }
+            }
+        } catch (error) {
+            alert('Error al subir la imagen');
+            console.error(error);
         }
     };
 
@@ -107,55 +166,172 @@ export default function AdminProductsPage() {
                                 <th className="px-6 py-4">Categoría</th>
                                 <th className="px-6 py-4">Precio</th>
                                 <th className="px-6 py-4">Tipo</th>
+                                <th className="px-6 py-4">Etiqueta</th>
                                 <th className="px-6 py-4 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredProducts.map(product => (
-                                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4">
-                                        <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden">
-                                            {product.imagenes[0] ? (
-                                                <img src={product.imagenes[0]} alt={product.nombre} className="w-full h-full object-cover" />
+                            {filteredProducts.map(product => {
+                                const isEditing = editingProductId === product.id;
+                                return (
+                                    <tr key={product.id} className={`${isEditing ? 'bg-pink-50/50' : 'hover:bg-gray-50'} transition-colors`}>
+                                        <td className="px-6 py-4">
+                                            <div className="relative group w-12 h-12 rounded-lg bg-gray-100 overflow-hidden cursor-pointer" onClick={() => document.getElementById(`file-input-${product.id}`)?.click()}>
+                                                {isEditing && editFormData.imagenes?.[0] ? (
+                                                    <img src={editFormData.imagenes[0]} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : product.imagenes[0] ? (
+                                                    <img src={product.imagenes[0]} alt={product.nombre} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-400">?</div>
+                                                )}
+                                                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    id={`file-input-${product.id}`}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) handleImageUpdate(product.id, file);
+                                                    }}
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-3 py-1.5 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none text-sm shadow-inner"
+                                                    value={editFormData.nombre}
+                                                    onChange={(e) => setEditFormData({ ...editFormData, nombre: e.target.value })}
+                                                />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400">?</div>
+                                                <span className="font-medium text-gray-900">{product.nombre}</span>
                                             )}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 font-medium text-gray-900">{product.nombre}</td>
-                                    <td className="px-6 py-4 text-gray-600">{product.category?.nombre || 'Sin categoría'}</td>
-                                    <td className="px-6 py-4 text-gray-900">
-                                        {product.precio ? `$${product.precio.toLocaleString()}` : 'Consultar'}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${product.tipo === 'STOCK' ? 'bg-green-100 text-green-700' :
-                                            product.tipo === 'PEDIDO' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-purple-100 text-purple-700'
-                                            }`}>
-                                            {product.tipo.toUpperCase()}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-3">
-                                            <Link
-                                                href={`/admin/productos/editar/${product.id}`}
-                                                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                                            >
-                                                Editar
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(product.id)}
-                                                className="text-red-600 hover:text-red-800 font-medium text-sm"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {isEditing ? (
+                                                <select
+                                                    className="w-full px-3 py-1.5 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none text-sm shadow-inner bg-white"
+                                                    value={editFormData.categoryId}
+                                                    onChange={(e) => setEditFormData({ ...editFormData, categoryId: e.target.value })}
+                                                >
+                                                    {categories.map(cat => (
+                                                        <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <span className="text-gray-600">{product.category?.nombre || 'Sin categoría'}</span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {isEditing ? (
+                                                <div className="relative">
+                                                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                                                    <input
+                                                        type="number"
+                                                        className="w-28 pl-6 pr-2 py-1.5 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none text-sm shadow-inner"
+                                                        value={editFormData.precio || ''}
+                                                        onChange={(e) => setEditFormData({ ...editFormData, precio: parseFloat(e.target.value) || null })}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-900">
+                                                    {product.precio ? `$${product.precio.toLocaleString()}` : 'Consultar'}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {isEditing ? (
+                                                <select
+                                                    className={`w-full px-3 py-1.5 rounded-full text-xs font-bold border-none cursor-pointer transition-colors shadow-sm outline-none ${editFormData.tipo === ProductType.STOCK ? 'bg-green-100 text-green-700' :
+                                                        editFormData.tipo === ProductType.PEDIDO ? 'bg-purple-100 text-purple-700' :
+                                                            'bg-rose-100 text-pink-700'
+                                                        }`}
+                                                    value={editFormData.tipo}
+                                                    onChange={(e) => setEditFormData({ ...editFormData, tipo: e.target.value as ProductType })}
+                                                >
+                                                    <option value={ProductType.STOCK} className="bg-white text-gray-900">LISTO (STOCK)</option>
+                                                    <option value={ProductType.PEDIDO} className="bg-white text-gray-900">A PEDIDO</option>
+                                                    <option value={ProductType.PERSONALIZADO} className="bg-white text-gray-900">PERSONALIZADO</option>
+                                                </select>
+                                            ) : (
+                                                <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${product.tipo === ProductType.STOCK ? 'bg-green-100 text-green-700' :
+                                                    product.tipo === ProductType.PEDIDO ? 'bg-purple-100 text-purple-700' :
+                                                        'bg-rose-100 text-pink-700'
+                                                    }`}>
+                                                    {product.tipo === ProductType.STOCK ? 'Stock' : product.tipo === ProductType.PEDIDO ? 'A Pedido' : 'Personalizado'}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {isEditing ? (
+                                                <select
+                                                    className={`w-full px-3 py-1.5 rounded-full text-xs font-bold border-none cursor-pointer transition-colors shadow-sm outline-none ${editFormData.label ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-600'
+                                                        }`}
+                                                    value={editFormData.label || ''}
+                                                    onChange={(e) => setEditFormData({ ...editFormData, label: e.target.value })}
+                                                >
+                                                    {PRODUCT_LABELS.map(l => (
+                                                        <option key={l.value} value={l.value} className="bg-white text-gray-900">{l.label}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                product.label ? (
+                                                    <span className="px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-widest bg-pink-500 text-white shadow-sm">
+                                                        {product.label}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400 text-xs italic">Sin etiqueta</span>
+                                                )
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-3">
+                                                {isEditing ? (
+                                                    <>
+                                                        <button
+                                                            onClick={handleSaveEdit}
+                                                            disabled={isSaving}
+                                                            className="text-green-600 hover:text-green-800 font-medium text-sm"
+                                                        >
+                                                            {isSaving ? '...' : 'Guardar'}
+                                                        </button>
+                                                        <button
+                                                            onClick={cancelEdit}
+                                                            className="text-gray-500 hover:text-gray-700 font-medium text-sm"
+                                                        >
+                                                            Cancelar
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={() => startEdit(product)}
+                                                            className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                                        >
+                                                            Editar
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(product.id)}
+                                                            className="text-red-600 hover:text-red-800 font-medium text-sm"
+                                                        >
+                                                            Eliminar
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                             {filteredProducts.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                         No se encontraron productos con esos filtros.
                                     </td>
                                 </tr>

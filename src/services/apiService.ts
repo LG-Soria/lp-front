@@ -92,6 +92,16 @@ export const apiService = {
         return response.json();
     },
 
+    async updateCategory(id: string, category: Partial<Category>): Promise<Category> {
+        const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(category),
+        });
+        if (!response.ok) throw new Error('Error updating category');
+        return response.json();
+    },
+
     async deleteCategory(id: string): Promise<void> {
         const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
             method: 'DELETE',

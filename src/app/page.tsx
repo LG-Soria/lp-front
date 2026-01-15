@@ -3,29 +3,31 @@
 import React from 'react';
 import Link from 'next/link';
 import { apiService } from '@/services/apiService';
-import { Product, ProductType } from '@/types';
+import { Product, ProductType, Category } from '@/types';
 import { StarDoodle, TapeDoodle, StickerDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, ShoppingBagDoodle } from '@/components/doodles';
 import { WavyCheckerboardBackground } from '@/components/background/WavyCheckerboardBg';
 
 export default function HomePage() {
   const [products, setProducts] = React.useState<Product[]>([]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    apiService.getProducts().then(data => {
-      setProducts(data);
+    Promise.all([
+      apiService.getProducts(),
+      apiService.getCategories()
+    ]).then(([productsData, categoriesData]) => {
+      setProducts(productsData);
+      setCategories(categoriesData);
       setLoading(false);
     });
   }, []);
 
   const featured = products.slice(0, 3);
 
-  // Configuración de categorías para el estilo scrapbook del final
-  const categories = [
-    { name: 'Hogar', color: '#FB7185', bg: 'bg-rosa-pastel', rotate: 'rotate-2', img: 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=800&auto=format&fit=crop' },
-    { name: 'Indumentaria', color: '#7C3AED', bg: 'bg-lila-suave', rotate: '-rotate-1', img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=800&auto=format&fit=crop' },
-    { name: 'Niños', color: '#F472B6', bg: 'bg-rosa-empolvado', rotate: 'rotate-3', img: 'https://images.unsplash.com/photo-1602738328654-51ab2339b3b3?q=80&w=800&auto=format&fit=crop' }
-  ];
+  // Colores por defecto para categorías que no tengan uno asignado
+  const defaultColors = ['#FB7185', '#7C3AED', '#F472B6', '#10B981', '#3B82F6'];
+  const defaultBgs = ['bg-rosa-pastel', 'bg-lila-suave', 'bg-rosa-empolvado', 'bg-green-100', 'bg-blue-100'];
 
   return (
     <div className="space-y-32 pb-24 ">
@@ -101,6 +103,9 @@ export default function HomePage() {
             const stickerTexts = ['Best seller', 'Hecho hoy', 'Favorito'];
             const stickerColors = ['#FB7185', '#7C3AED', '#F472B6'];
 
+            const stickerText = product.label || stickerTexts[index % stickerTexts.length];
+            const stickerColor = product.category?.color || stickerColors[index % stickerColors.length];
+
             const shadowClasses = [
               'group-hover:shadow-[0_40px_80px_-15px_rgba(251,113,133,0.4)]',
               'group-hover:shadow-[0_40px_80px_-15px_rgba(124,58,237,0.3)]',
@@ -125,12 +130,12 @@ export default function HomePage() {
                   <div className={`absolute -inset-4 bg-rosa-pastel rounded-full -z-10 ${isEven ? '-rotate-3' : 'rotate-3'} opacity-50 blur-sm`}></div>
 
                   <StickerDoodle
-                    text={stickerTexts[index % stickerTexts.length]}
-                    color={stickerColors[index % stickerColors.length]}
+                    text={stickerText}
+                    color={stickerColor}
                     className={`absolute ${isEven ? '-top-10 -right-6' : '-top-10 -left-6'} z-20 scale-110 shadow-xl rotate-12 transition-all duration-500 group-hover:rotate-[-4deg] group-hover:-translate-y-6 group-hover:scale-125`}
                   />
                   <StarDoodle className={`absolute ${isEven ? '-bottom-10 -left-10' : '-bottom-10 -right-10'} w-16 h-16 text-lila-suave opacity-40`} />
-                  <TapeDoodle color={stickerColors[(index + 1) % 3]} className={`absolute ${isEven ? 'bottom-20 -right-8' : 'bottom-20 -left-8'} rotate-90 opacity-40`} />
+                  <TapeDoodle color={stickerColor} className={`absolute ${isEven ? 'bottom-20 -right-8' : 'bottom-20 -left-8'} rotate-90 opacity-40`} />
                 </div>
 
                 <div className={`grow text-center lg:text-left space-y-6 max-w-xl`}>
@@ -209,45 +214,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categorías - Estilo Scrapbook */}
       <section className="container mx-auto px-4 pt-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
-          {categories.map((cat, i) => (
-            <div key={cat.name} className="relative group">
-              <div className={`absolute inset-0 ${cat.bg} opacity-40 rounded-3xl -rotate-3 group-hover:-rotate-6 transition-all duration-500 shadow-sm border border-gray-100`}></div>
+          {categories.slice(0, 3).map((cat, i) => {
+            const catData = {
+              nombre: cat.nombre,
+              color: cat.color || defaultColors[i % defaultColors.length],
+              bg: defaultBgs[i % defaultBgs.length],
+              rotate: i % 2 === 0 ? 'rotate-2' : '-rotate-1',
+              img: cat.imageUrl || 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=800&auto=format&fit=crop'
+            };
 
-              <Link
-                href="/categorias"
-                className={`relative block p-4 bg-white shadow-xl rounded-sm ${cat.rotate} group-hover:rotate-0 transition-all duration-500`}
-              >
-                <TapeDoodle color={cat.color} className="absolute -top-3 left-1/2 -translate-x-1/2 z-30" />
-                {i === 0 && <TapeDoodle color="#F472B6" className="absolute -bottom-2 -left-4 z-30 rotate-12 w-12" />}
-                {i === 2 && <TapeDoodle color="#7C3AED" className="absolute top-1/2 -right-6 z-30 rotate-90 w-16" />}
+            return (
+              <div key={cat.id} className="relative group">
+                <div className={`absolute inset-0 ${catData.bg} opacity-40 rounded-3xl -rotate-3 group-hover:-rotate-6 transition-all duration-500 shadow-sm border border-gray-100`}></div>
 
-                <div className="relative overflow-hidden rounded-sm aspect-4/5">
-                  <img
-                    src={cat.img}
-                    className="w-full h-full object-cover grayscale-20 group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                    alt={cat.name}
-                  />
-                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cardboard-flat.png')] opacity-30 pointer-events-none"></div>
-                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity"></div>
+                <Link
+                  href="/categorias"
+                  className={`relative block p-4 bg-white shadow-xl rounded-sm ${catData.rotate} group-hover:rotate-0 transition-all duration-500`}
+                >
+                  <TapeDoodle color={catData.color} className="absolute -top-3 left-1/2 -translate-x-1/2 z-30" />
+                  {i === 0 && <TapeDoodle color="#F472B6" className="absolute -bottom-2 -left-4 z-30 rotate-12 w-12" />}
+                  {i === 2 && <TapeDoodle color="#7C3AED" className="absolute top-1/2 -right-6 z-30 rotate-90 w-16" />}
 
-                  <div className="absolute inset-0 flex flex-col items-center justify-end pb-8">
-                    <h3 className="text-white text-3xl lg:text-4xl font-script font-bold drop-shadow-lg group-hover:scale-110 transition-transform">
-                      {cat.name}
-                    </h3>
-                    <span className="text-white/80 text-[10px] uppercase tracking-[0.2em] font-bold mt-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                      Explorar colección
-                    </span>
+                  <div className="relative overflow-hidden rounded-sm aspect-4/5">
+                    <img
+                      src={catData.img}
+                      className="w-full h-full object-cover grayscale-20 group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                      alt={catData.nombre}
+                    />
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cardboard-flat.png')] opacity-30 pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity"></div>
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-8">
+                      <h3 className="text-white text-3xl lg:text-4xl font-script font-bold drop-shadow-lg group-hover:scale-110 transition-transform">
+                        {catData.nombre}
+                      </h3>
+                      <span className="text-white/80 text-[10px] uppercase tracking-[0.2em] font-bold mt-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                        Explorar colección
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
 
-              {i === 0 && <ShoppingBagDoodle className="absolute -bottom-8 -right-4 w-24 h-24 opacity-30 group-hover:animate-bounce-slow" />}
-              {i === 1 && <StarDoodle className="absolute -top-10 -right-8 w-12 h-12 text-rosa-empolvado opacity-60 group-hover:animate-spin-slow" />}
-            </div>
-          ))}
+                {i === 0 && <ShoppingBagDoodle className="absolute -bottom-8 -right-4 w-24 h-24 opacity-30 group-hover:animate-bounce-slow" />}
+                {i === 1 && <StarDoodle className="absolute -top-10 -right-8 w-12 h-12 text-rosa-empolvado opacity-60 group-hover:animate-spin-slow" />}
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>
