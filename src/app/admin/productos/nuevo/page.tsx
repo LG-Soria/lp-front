@@ -33,10 +33,14 @@ export default function ProductFormPage() {
     }, []);
 
     const loadCategories = async () => {
-        const data = await apiService.getCategories();
-        setCategories(data);
-        if (data.length > 0 && !formData.categoryId) {
-            setFormData(prev => ({ ...prev, categoryId: data[0].id }));
+        try {
+            const data = await apiService.getCategories();
+            setCategories(data);
+            if (data.length > 0 && !formData.categoryId) {
+                setFormData(prev => ({ ...prev, categoryId: data[0].id }));
+            }
+        } catch (error) {
+            console.error('Error loading categories:', error);
         }
     };
 

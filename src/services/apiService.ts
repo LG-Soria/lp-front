@@ -10,6 +10,26 @@ const getAuthHeaders = () => {
     };
 };
 
+const handleResponse = async (response: Response) => {
+    if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('lp_admin_token');
+            localStorage.removeItem('lp_admin_user');
+            // Eliminar cookie
+            document.cookie = 'lp_admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            window.location.href = '/admin/login';
+        }
+        throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+    }
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || `Error: ${response.status}`);
+    }
+
+    return response.json();
+};
+
 export const apiService = {
     // Productos
     async getProducts(): Promise<Product[]> {
@@ -40,11 +60,7 @@ export const apiService = {
             headers: getAuthHeaders(),
             body: JSON.stringify(product),
         });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error creating product');
-        }
-        return response.json();
+        return handleResponse(response);
     },
 
     async updateProduct(id: string, product: Partial<Product>): Promise<Product> {
@@ -53,11 +69,7 @@ export const apiService = {
             headers: getAuthHeaders(),
             body: JSON.stringify(product),
         });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error updating product');
-        }
-        return response.json();
+        return handleResponse(response);
     },
 
     async deleteProduct(id: string): Promise<void> {
@@ -65,6 +77,9 @@ export const apiService = {
             method: 'DELETE',
             headers: getAuthHeaders(),
         });
+        if (response.status === 401) {
+            await handleResponse(response);
+        }
         if (!response.ok) {
             throw new Error('Error deleting product');
         }
@@ -88,8 +103,7 @@ export const apiService = {
             headers: getAuthHeaders(),
             body: JSON.stringify(category),
         });
-        if (!response.ok) throw new Error('Error creating category');
-        return response.json();
+        return handleResponse(response);
     },
 
     async updateCategory(id: string, category: Partial<Category>): Promise<Category> {
@@ -98,8 +112,7 @@ export const apiService = {
             headers: getAuthHeaders(),
             body: JSON.stringify(category),
         });
-        if (!response.ok) throw new Error('Error updating category');
-        return response.json();
+        return handleResponse(response);
     },
 
     async deleteCategory(id: string): Promise<void> {
@@ -107,6 +120,9 @@ export const apiService = {
             method: 'DELETE',
             headers: getAuthHeaders(),
         });
+        if (response.status === 401) {
+            await handleResponse(response);
+        }
         if (!response.ok) throw new Error('Error deleting category');
     },
 
@@ -117,8 +133,7 @@ export const apiService = {
             headers: getAuthHeaders(),
             body: JSON.stringify({ fileName, contentType }),
         });
-        if (!response.ok) throw new Error('Error getting presigned URL');
-        return response.json();
+        return handleResponse(response);
     },
 
     async uploadFileToR2(uploadUrl: string, file: File): Promise<void> {
