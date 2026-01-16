@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiService } from '@/services/apiService';
-import { CATEGORIES } from '@/constants';
-import { StarDoodle, StitchDivider, TapeDoodle, WavyLine } from '@/components/doodles';
+import { StarDoodle, StitchDivider, TapeDoodle, WavyLine, SmileyFlowerDoodle } from '@/components/doodles';
 import { Product, ProductType, Category } from '@/types';
 import { ProductCard } from '@/components/ProductCard';
 
@@ -38,60 +37,76 @@ export default function CategoryPage() {
         setActiveType((prev: ProductType | null) => prev === type ? null : type);
     };
 
-    const catStyles: Record<string, { bg: string, color: string, rotate: string }> = {
-        'Todas': { bg: 'bg-white', color: '#374151', rotate: '-rotate-2' },
-        'Hogar': { bg: 'bg-rosa-pastel', color: '#dc1537', rotate: 'rotate-1' },
-        'Indumentaria': { bg: 'bg-lila-suave', color: '#7C3AED', rotate: '-rotate-1' },
-        'Niños': { bg: 'bg-orange-50', color: '#F59E0B', rotate: 'rotate-2' },
+    // Generate dynamic styles for categories
+    const getCategoryStyle = (catName: string, index: number) => {
+        const cat = categories.find(c => c.nombre === catName);
+        const baseColor = cat?.color || '#FF69B4'; // Rosa por defecto
+
+        // Rotación alternada
+        const rotate = index % 2 === 0 ? 'rotate-1' : '-rotate-1';
+        const rotateReverse = index % 2 === 0 ? '-rotate-1' : 'rotate-1';
+
+        return {
+            color: baseColor,
+            rotate,
+            rotateReverse,
+            // Usamos un fondo muy suave basado en el color si no es "Todas"
+            bg: catName === 'Todas' ? 'bg-white' : 'bg-white',
+            border: catName === 'Todas' ? 'border-gray-100' : `border-transparent`
+        };
     };
 
     return (
-        // Se aumentó el padding horizontal (px-8 md:px-16 lg:px-24) para dar más aire a los costados
         <div className="container mx-auto px-8 md:px-16 lg:px-24 py-20 min-h-screen bg-doodle-dots relative">
-            {/* Estrellas decorativas de fondo */}
-            <StarDoodle className="absolute top-40 right-10 w-24 h-24 text-[#f89eb6] opacity-80 rotate-12" />
-            <StarDoodle className="absolute bottom-20 left-10 w-20 h-20 text-[#f89eb6] opacity-60 -rotate-12" />
-            <StarDoodle className="absolute top-1/2 left-1/4 w-12 h-12 text-[#f89eb6] opacity-40 rotate-45" />
+            {/* ... doodles ... */}
+            <StarDoodle className="absolute top-10 right-10 w-32 h-32 text-coral opacity-5 animate-pulse" />
+            <SmileyFlowerDoodle className="absolute bottom-10 left-10 w-40 h-40 text-lila-suave opacity-5" />
 
-            <div className="max-w-4xl mb-24 relative z-10">
-                <StarDoodle className="absolute -top-14 -left-12 w-24 h-24 text-[#d97891] opacity-100 z-30 drop-shadow-sm" />
-
-                <h1 className="text-5xl md:text-7xl font-heading font-bold mb-6 text-gray-900 relative">
-                    Explorá el <span className="font-script text-coral">catálogo</span>
+            <header className="mb-20 text-center lg:text-left">
+                <h1 className="text-6xl md:text-7xl font-heading font-bold text-gray-900 mb-6">
+                    Nuestras <br /> <span className="font-script text-coral text-7xl md:text-8xl">Colecciones</span>
                 </h1>
-                <p className="text-xl text-gray-800/70 font-medium leading-relaxed max-w-2xl">
-                    Piezas únicas que no salen de un molde, sino de un proceso lento y dedicado.
-                    Buscá la que resuene con vos.
+                <p className="text-xl text-gray-500 max-w-2xl font-medium">
+                    Explorá nuestras piezas artesanales organizadas por categoría. Cada una tejida con dedicación.
                 </p>
-                <WavyLine className="w-32 text-coral/30 mt-6" />
-            </div>
+            </header>
 
-            {/* Categorías estilo Scrapbook Tags */}
-            <div className="flex flex-wrap items-center gap-8 mb-12 relative z-10">
-                {allCategoryNames.map((cat) => {
-                    const isActive = activeCategory === cat;
-                    const style = catStyles[cat] || catStyles['Todas'];
+            {/* Category Navigation */}
+            <div className="flex flex-wrap items-center gap-8 mb-16 relative z-10">
+                {allCategoryNames.map((catName, i) => {
+                    const isActive = activeCategory === catName;
+                    const style = getCategoryStyle(catName, i);
 
                     return (
-                        <div key={cat} className="relative group">
+                        <div key={catName} className="relative group">
                             {isActive && (
                                 <TapeDoodle
                                     color={style.color}
-                                    className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 scale-110"
+                                    className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 scale-110 transition-transform duration-500"
                                 />
                             )}
-
                             <button
-                                onClick={() => setActiveCategory(cat)}
+                                onClick={() => setActiveCategory(catName)}
                                 className={`
-                  relative px-10 py-4 font-heading font-extrabold text-lg transition-all duration-300
-                  ${style.bg} ${isActive ? 'shadow-xl shadow-gray-200/50 -translate-y-1' : 'shadow-sm border border-gray-100 hover:rotate-0'}
-                  ${style.rotate} rounded-sm
-                `}
-                                style={{ color: isActive ? style.color : '#9CA3AF' }}
+                                    relative px-10 py-5 font-heading font-extrabold text-xl transition-all duration-300
+                                    ${isActive ? 'shadow-xl shadow-gray-200/50 -translate-y-2' : 'shadow-sm border border-gray-100/50 hover:rotate-0'}
+                                    ${style.rotate} rounded-sm bg-white
+                                `}
+                                style={{
+                                    color: isActive ? style.color : '#9CA3AF',
+                                    borderColor: isActive ? `${style.color}30` : undefined,
+                                    boxShadow: isActive ? `0 20px 25px -5px ${style.color}15` : undefined
+                                }}
                             >
-                                {cat}
-                                <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-0.5 opacity-0 group-hover:opacity-20 transition-opacity`} style={{ backgroundColor: style.color }}></div>
+                                {catName}
+                                <div
+                                    className={`absolute bottom-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity`}
+                                    style={{ backgroundColor: style.color }}
+                                ></div>
+
+                                {isActive && (
+                                    <div className="absolute -right-2 -top-2 w-4 h-4 rounded-full animate-ping opacity-20" style={{ backgroundColor: style.color }}></div>
+                                )}
                             </button>
                         </div>
                     );

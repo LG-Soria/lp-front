@@ -217,38 +217,35 @@ export default function HomePage() {
       <section className="container mx-auto px-4 pt-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
           {categories.slice(0, 3).map((cat, i) => {
-            const catData = {
-              nombre: cat.nombre,
-              color: cat.color || defaultColors[i % defaultColors.length],
-              bg: defaultBgs[i % defaultBgs.length],
-              rotate: i % 2 === 0 ? 'rotate-2' : '-rotate-1',
-              img: cat.imageUrl || 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=800&auto=format&fit=crop'
-            };
+            const catColor = cat.color || defaultColors[i % defaultColors.length];
+            const rotate = i % 2 === 0 ? 'rotate-2' : '-rotate-1';
+            const img = cat.imageUrl || 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=800&auto=format&fit=crop'
 
             return (
               <div key={cat.id} className="relative group">
-                <div className={`absolute inset-0 ${catData.bg} opacity-40 rounded-3xl -rotate-3 group-hover:-rotate-6 transition-all duration-500 shadow-sm border border-gray-100`}></div>
+                <div
+                  className={`absolute inset-0 opacity-20 rounded-3xl -rotate-3 group-hover:-rotate-6 transition-all duration-500 shadow-sm border border-gray-100/50`}
+                  style={{ backgroundColor: catColor }}
+                ></div>
 
                 <Link
                   href="/categorias"
-                  className={`relative block p-4 bg-white shadow-xl rounded-sm ${catData.rotate} group-hover:rotate-0 transition-all duration-500`}
+                  className={`relative block p-4 bg-white shadow-xl rounded-sm ${rotate} group-hover:rotate-0 transition-all duration-500`}
                 >
-                  <TapeDoodle color={catData.color} className="absolute -top-3 left-1/2 -translate-x-1/2 z-30" />
-                  {i === 0 && <TapeDoodle color="#F472B6" className="absolute -bottom-2 -left-4 z-30 rotate-12 w-12" />}
-                  {i === 2 && <TapeDoodle color="#7C3AED" className="absolute top-1/2 -right-6 z-30 rotate-90 w-16" />}
+                  <TapeDoodle color={catColor} className="absolute -top-3 left-1/2 -translate-x-1/2 z-30" />
 
                   <div className="relative overflow-hidden rounded-sm aspect-4/5">
                     <img
-                      src={catData.img}
+                      src={img}
                       className="w-full h-full object-cover grayscale-20 group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                      alt={catData.nombre}
+                      alt={cat.nombre}
                     />
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cardboard-flat.png')] opacity-30 pointer-events-none"></div>
                     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity"></div>
 
                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-8">
                       <h3 className="text-white text-3xl lg:text-4xl font-script font-bold drop-shadow-lg group-hover:scale-110 transition-transform">
-                        {catData.nombre}
+                        {cat.nombre}
                       </h3>
                       <span className="text-white/80 text-[10px] uppercase tracking-[0.2em] font-bold mt-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
                         Explorar colección

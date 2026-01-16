@@ -33,25 +33,13 @@ const handleResponse = async (response: Response) => {
 export const apiService = {
     // Productos
     async getProducts(): Promise<Product[]> {
-        try {
-            const response = await fetch(`${API_BASE_URL}/products`);
-            if (!response.ok) throw new Error('Error fetching products');
-            return response.json();
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
+        const response = await fetch(`${API_BASE_URL}/products`);
+        return handleResponse(response).catch(() => []);
     },
 
     async getProductById(id: string): Promise<Product | null> {
-        try {
-            const response = await fetch(`${API_BASE_URL}/products/${id}`);
-            if (!response.ok) throw new Error('Error fetching product');
-            return response.json();
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
+        const response = await fetch(`${API_BASE_URL}/products/${id}`);
+        return handleResponse(response).catch(() => null);
     },
 
     async createProduct(product: Partial<Product>): Promise<Product> {
@@ -77,24 +65,13 @@ export const apiService = {
             method: 'DELETE',
             headers: getAuthHeaders(),
         });
-        if (response.status === 401) {
-            await handleResponse(response);
-        }
-        if (!response.ok) {
-            throw new Error('Error deleting product');
-        }
+        await handleResponse(response);
     },
 
     // Categorías
     async getCategories(): Promise<Category[]> {
-        try {
-            const response = await fetch(`${API_BASE_URL}/categories`);
-            if (!response.ok) throw new Error('Error fetching categories');
-            return response.json();
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        return handleResponse(response).catch(() => []);
     },
 
     async createCategory(category: { nombre: string }): Promise<Category> {
@@ -120,10 +97,7 @@ export const apiService = {
             method: 'DELETE',
             headers: getAuthHeaders(),
         });
-        if (response.status === 401) {
-            await handleResponse(response);
-        }
-        if (!response.ok) throw new Error('Error deleting category');
+        await handleResponse(response);
     },
 
     // Subida de Imágenes

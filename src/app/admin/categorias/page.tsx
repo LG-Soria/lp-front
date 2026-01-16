@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '@/services/apiService';
 import { Category } from '@/types';
+import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
 
 export default function AdminCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -111,156 +112,205 @@ export default function AdminCategoriesPage() {
     };
 
     return (
-        <div className="p-8 max-w-4xl mx-auto">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Categorías</h1>
-                <p className="text-gray-600">Organiza tus productos en categorías para que los clientes los encuentren fácil.</p>
+        <div className="min-h-screen bg-gray-50/50 p-8 md:p-12 lg:p-16 relative overflow-hidden">
+            {/* Background Doodles */}
+            <div className="absolute top-20 -right-10 opacity-20 rotate-12">
+                <StarDoodle className="w-40 h-40 text-coral" />
+            </div>
+            <div className="absolute bottom-20 -left-10 opacity-20 -rotate-12">
+                <SmileyFlowerDoodle className="w-48 h-48 text-coral" />
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 mb-8">
-                <h2 className="text-lg font-semibold mb-4">Nueva Categoría</h2>
-                <form onSubmit={handleSubmit} className="flex gap-4">
-                    <input
-                        type="text"
-                        placeholder="Nombre de la categoría (ej: Decoración)"
-                        className="flex-1 px-4 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-pink-500 outline-none"
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        disabled={isSubmitting}
-                    />
-                    <button
-                        type="submit"
-                        disabled={isSubmitting || !newCategoryName.trim()}
-                        className={`px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 font-medium transition-colors ${isSubmitting ? 'opacity-50' : ''}`}
-                    >
-                        {isSubmitting ? 'Agregando...' : 'Agregar'}
-                    </button>
-                </form>
-            </div>
+            <div className="max-w-5xl mx-auto relative z-10">
+                <div className="mb-12">
+                    <h1 className="text-4xl font-heading font-bold text-gray-900">Categorías de <span className="text-coral">Admin</span></h1>
+                    <p className="text-gray-500 font-medium text-lg">Organizá tus productos para una mejor experiencia de compra.</p>
+                </div>
 
-            <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 text-gray-700 font-semibold text-sm uppercase">
-                            <th className="px-6 py-4">Nombre</th>
-                            <th className="px-6 py-4 text-center">Productos</th>
-                            <th className="px-6 py-4 text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                                    Cargando categorías...
-                                </td>
+                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-[32px] shadow-sm border border-gray-100 mb-12">
+                    <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <span className="w-2 h-8 bg-coral rounded-full"></span>
+                        Nueva Categoría
+                    </h2>
+                    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 relative group">
+                            <input
+                                type="text"
+                                placeholder="Nombre (ej: Decoración, Accesorios...)"
+                                className="w-full pl-6 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
+                                value={newCategoryName}
+                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                disabled={isSubmitting}
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting || !newCategoryName.trim()}
+                            className="bg-coral text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-rose-200 hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                        >
+                            {isSubmitting ? 'Agregando...' : 'Agregar'}
+                        </button>
+                    </form>
+                </div>
+
+                <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50 border-b border-gray-100">
+                                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-gray-400">Nombre</th>
+                                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-gray-400 text-center">Productos</th>
+                                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-gray-400 text-right">Acciones</th>
                             </tr>
-                        ) : categories.length === 0 ? (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                                    Aún no has creado ninguna categoría.
-                                </td>
-                            </tr>
-                        ) : (
-                            categories.map(category => (
-                                <tr key={category.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-gray-900">{category.nombre}</td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className="bg-gray-100 px-2 py-1 rounded-md text-sm text-gray-600">
-                                            {category._count?.products || 0}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-3">
-                                            <button
-                                                onClick={() => openEditModal(category)}
-                                                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                                            >
-                                                Editar
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(category.id, category._count?.products || 0)}
-                                                className="text-red-600 hover:text-red-800 font-medium text-sm"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                                        Cargando categorías...
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Modal de Edición */}
-            {isEditModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                        <h2 className="text-xl font-bold mb-4">Editar Categoría</h2>
-                        <form onSubmit={handleUpdate} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold mb-1">Nombre</label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-2 border rounded-md"
-                                    value={editForm.nombre}
-                                    onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold mb-1">Color de Etiqueta</label>
-                                <div className="flex gap-2 items-center">
-                                    <input
-                                        type="color"
-                                        className="h-10 w-20 border rounded cursor-pointer"
-                                        value={editForm.color}
-                                        onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
-                                    />
-                                    <span className="text-sm font-mono">{editForm.color}</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold mb-1">Imagen de Portada</label>
-                                <div className="space-y-2">
-                                    {editForm.imageUrl && (
-                                        <img src={editForm.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md" />
-                                    )}
-                                    <div className="flex items-center justify-center w-full">
-                                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                                                </svg>
-                                                <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">{isUploading ? 'Subiendo...' : 'Haz clic para subir'}</span></p>
+                            ) : categories.length === 0 ? (
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                                        Aún no has creado ninguna categoría.
+                                    </td>
+                                </tr>
+                            ) : (
+                                categories.map(category => (
+                                    <tr key={category.id} className="hover:bg-gray-50/50 transition-colors">
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color || '#FF69B4' }}></div>
+                                                <span className="font-bold text-gray-900 uppercase tracking-tight">{category.nombre}</span>
                                             </div>
-                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading} />
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex justify-end gap-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsEditModalOpen(false)}
-                                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting || isUploading}
-                                    className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 disabled:opacity-50"
-                                >
-                                    {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                                        </td>
+                                        <td className="px-8 py-6 text-center">
+                                            <span className="bg-gray-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter text-gray-500">
+                                                {category._count?.products || 0} ITEMS
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex justify-end gap-3">
+                                                <button
+                                                    onClick={() => openEditModal(category)}
+                                                    className="text-gray-400 hover:text-coral hover:scale-110 transition-all"
+                                                    title="Editar"
+                                                >
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(category.id, category._count?.products || 0)}
+                                                    className="text-gray-400 hover:text-red-500 hover:scale-110 transition-all"
+                                                    title="Eliminar"
+                                                >
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+
+                {/* Modal de Edición */}
+                {isEditModalOpen && (
+                    <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-100 animate-in fade-in duration-300">
+                        <div className="bg-white rounded-[40px] shadow-2xl max-w-2xl w-full p-10 relative overflow-hidden">
+                            <StarDoodle className="absolute -top-10 -right-10 w-40 h-40 text-coral opacity-10 rotate-12" />
+
+                            <div className="relative z-10">
+                                <h2 className="text-3xl font-heading font-bold text-gray-900 mb-2">
+                                    Editar <span className="text-coral">Categoría</span>
+                                </h2>
+                                <p className="text-gray-500 font-medium mb-10">Ajustá la identidad visual de esta sección.</p>
+
+                                <form onSubmit={handleUpdate} className="space-y-10">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                        <div className="space-y-6">
+                                            <div className="space-y-3">
+                                                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Nombre de Categoría</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-bold transition-all"
+                                                    value={editForm.nombre}
+                                                    onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Color de Identidad</label>
+                                                <div className="flex gap-4 items-center bg-gray-50 p-3 rounded-2xl">
+                                                    <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-sm border-2 border-white">
+                                                        <input
+                                                            type="color"
+                                                            className="absolute inset-0 w-[200%] h-[200%] -translate-x-1/4 -translate-y-1/4 cursor-pointer"
+                                                            value={editForm.color}
+                                                            onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-black font-mono text-gray-700 uppercase">{editForm.color}</span>
+                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Color de doodles y etiquetas</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Imagen de Portada</label>
+                                            <div className="relative group aspect-4/5 rounded-[32px] overflow-hidden bg-gray-50 border-4 border-white shadow-md">
+                                                {editForm.imageUrl ? (
+                                                    <>
+                                                        <img src={editForm.imageUrl} alt="Preview" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                        <div className="absolute inset-0 bg-coral/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <label className="bg-white text-coral px-4 py-2 rounded-full text-xs font-bold cursor-pointer hover:scale-105 transition-transform shadow-lg">
+                                                                Cambiar Imagen
+                                                                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isSubmitting} />
+                                                            </label>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors">
+                                                        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-gray-300 mb-3 shadow-sm">
+                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                                                        </div>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{isUploading ? 'Subiendo...' : 'Subir Portada'}</span>
+                                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isSubmitting} />
+                                                    </label>
+                                                )}
+                                                {isUploading && (
+                                                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+                                                        <div className="w-8 h-8 border-4 border-coral border-t-transparent rounded-full animate-spin"></div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-6 pt-6">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsEditModalOpen(false)}
+                                            className="px-8 py-4 rounded-full font-bold text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            Descartar
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting || isUploading}
+                                            className="bg-coral text-white px-10 py-4 rounded-full font-bold shadow-xl shadow-rose-200 hover:scale-105 transition-all disabled:opacity-50"
+                                        >
+                                            {isSubmitting ? 'Guardando...' : 'Aplicar Cambios'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
