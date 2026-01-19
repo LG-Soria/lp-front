@@ -20,9 +20,11 @@ export const AdminHeader: React.FC = () => {
             <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-12">
                     <Link href="/admin" className="flex items-center gap-2 group">
-                        <span className="text-2xl font-black tracking-tighter text-gray-900 group-hover:text-coral transition-colors">
-                            LOCAS<span className="text-coral">.</span>
-                        </span>
+                        <img
+                            src="/logo.png"
+                            alt="Locas Puntadas Logo"
+                            className="h-10 w-auto object-contain"
+                        />
                         <span className="bg-coral/10 text-coral text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest mt-1">Admin</span>
                     </Link>
 

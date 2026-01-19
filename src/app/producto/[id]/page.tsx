@@ -8,6 +8,7 @@ import { Product, ProductType } from '@/types';
 import { SmileyFlowerDoodle, StarDoodle, TapeDoodle, StickerDoodle, HeartDoodle, WavyLine } from '@/components/doodles';
 import { WavyCheckerboardBackground } from '@/components/background/WavyCheckerboardBg';
 import { useCart } from '@/context/CartContext';
+import { PersonalizableBanner } from '@/components/PersonalizableBanner';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -163,6 +164,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                         {product.descripcion}
                                     </p>
                                 </div>
+
+                                {product.personalizable && (
+                                    <PersonalizableBanner
+                                        productName={product.nombre}
+                                        productUrl={typeof window !== 'undefined' ? window.location.href : ''}
+                                    />
+                                )}
 
                                 {/* Detalles de producción estilo "Frosted Glass" con blur */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">

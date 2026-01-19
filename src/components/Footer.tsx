@@ -11,7 +11,11 @@ export const Footer: React.FC = () => {
 
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left relative z-10">
         <div className="space-y-6">
-          <h3 className="font-script text-4xl text-coral">LocasPuntadas</h3>
+          <img
+            src="/logo.png"
+            alt="Locas Puntadas Logo"
+            className="h-16 w-auto object-contain mx-auto md:mx-0"
+          />
           <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto md:mx-0 font-medium">
             Piezas artesanales tejidas a mano. Productos únicos hechos con tiempo, dedicación y mucha alma.
           </p>

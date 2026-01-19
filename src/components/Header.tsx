@@ -17,9 +17,11 @@ export const Header: React.FC<HeaderProps> = ({ cartCount }) => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-3xl font-bold font-script text-coral">
-              LocasPuntadas
-            </span>
+            <img
+              src="/logo.png"
+              alt="Locas Puntadas Logo"
+              className="h-12 w-auto object-contain"
+            />
           </Link>
 
           {token && !isAdmin && (
