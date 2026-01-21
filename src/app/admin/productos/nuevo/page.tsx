@@ -16,12 +16,17 @@ export default function ProductFormPage() {
         nombre: '',
         descripcion: '',
         precio: '',
+        displayPrecio: '',
         tipo: ProductType.STOCK,
         label: '',
         categoryId: '',
         tiempoProduccion: '',
         personalizable: false,
-        imagenes: ['']
+        imagenes: [''],
+        weightGrams: '',
+        lengthCm: '',
+        widthCm: '',
+        heightCm: ''
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(isEditing);
@@ -53,12 +58,17 @@ export default function ProductFormPage() {
                     nombre: product.nombre,
                     descripcion: product.descripcion || '',
                     precio: product.precio?.toString() || '',
+                    displayPrecio: product.precio ? product.precio.toLocaleString('es-AR') : '',
                     tipo: product.tipo,
                     label: product.label || '',
                     categoryId: product.categoryId,
                     tiempoProduccion: product.tiempoProduccion || '',
                     personalizable: product.personalizable,
-                    imagenes: product.imagenes.length > 0 ? product.imagenes : ['']
+                    imagenes: product.imagenes.length > 0 ? product.imagenes : [''],
+                    weightGrams: product.weightGrams?.toString() || '',
+                    lengthCm: product.lengthCm?.toString() || '',
+                    widthCm: product.widthCm?.toString() || '',
+                    heightCm: product.heightCm?.toString() || ''
                 });
             }
         } catch (error) {
@@ -75,8 +85,14 @@ export default function ProductFormPage() {
         const payload = {
             ...formData,
             precio: formData.precio ? parseFloat(formData.precio) : null,
-            imagenes: formData.imagenes.filter(img => img.trim() !== '')
+            imagenes: formData.imagenes.filter(img => img.trim() !== ''),
+            weightGrams: formData.weightGrams ? parseInt(formData.weightGrams) : null,
+            lengthCm: formData.lengthCm ? parseInt(formData.lengthCm) : null,
+            widthCm: formData.widthCm ? parseInt(formData.widthCm) : null,
+            heightCm: formData.heightCm ? parseInt(formData.heightCm) : null
         };
+        // Remove display field from payload
+        delete (payload as any).displayPrecio;
 
         console.log('Enviando payload al backend:', JSON.stringify(payload, null, 2));
 
@@ -165,10 +181,15 @@ export default function ProductFormPage() {
                                 <div className="relative">
                                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
                                     <input
-                                        type="number"
+                                        type="text"
                                         className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
-                                        value={formData.precio}
-                                        onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
+                                        value={formData.displayPrecio}
+                                        onChange={(e) => {
+                                            const rawValue = e.target.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+                                            const numericValue = rawValue === '' ? '' : parseInt(rawValue, 10).toString();
+                                            const formattedValue = rawValue === '' ? '' : parseInt(rawValue, 10).toLocaleString('es-AR');
+                                            setFormData({ ...formData, precio: numericValue, displayPrecio: formattedValue });
+                                        }}
                                         placeholder="Ej: 15.000"
                                     />
                                 </div>
@@ -183,7 +204,6 @@ export default function ProductFormPage() {
                                 >
                                     <option value={ProductType.STOCK}>En Stock (Envío inmediato)</option>
                                     <option value={ProductType.PEDIDO}>A Pedido (Tiempo de fabricación)</option>
-                                    <option value={ProductType.PERSONALIZADO}>Personalizado (A coordinar)</option>
                                 </select>
                             </div>
                         </div>
@@ -222,16 +242,18 @@ export default function ProductFormPage() {
                                     </select>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Tiempo estimado</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Ej: 5 días hábiles"
-                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
-                                        value={formData.tiempoProduccion}
-                                        onChange={(e) => setFormData({ ...formData, tiempoProduccion: e.target.value })}
-                                    />
-                                </div>
+                                {formData.tipo === ProductType.PEDIDO && (
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-black uppercase tracking-widest text-gray-400">Tiempo estimado</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: 5 días hábiles"
+                                            className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
+                                            value={formData.tiempoProduccion}
+                                            onChange={(e) => setFormData({ ...formData, tiempoProduccion: e.target.value })}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <label className="flex items-center gap-4 cursor-pointer group w-fit">
@@ -248,6 +270,57 @@ export default function ProductFormPage() {
                                 </div>
                                 <span className="text-sm font-bold text-gray-600 group-hover:text-coral transition-colors">Permitir personalización</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <div className="bg-white/80 backdrop-blur-sm p-10 rounded-[40px] shadow-sm border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                            <span className="w-2 h-8 bg-coral rounded-full"></span>
+                            Logística y Envío
+                        </h2>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Peso (gramos) *</label>
+                                <input
+                                    required
+                                    type="number"
+                                    placeholder="Ej: 500"
+                                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
+                                    value={formData.weightGrams}
+                                    onChange={(e) => setFormData({ ...formData, weightGrams: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Largo (cm)</label>
+                                <input
+                                    type="number"
+                                    placeholder="Ej: 30"
+                                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
+                                    value={formData.lengthCm}
+                                    onChange={(e) => setFormData({ ...formData, lengthCm: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Ancho (cm)</label>
+                                <input
+                                    type="number"
+                                    placeholder="Ej: 20"
+                                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
+                                    value={formData.widthCm}
+                                    onChange={(e) => setFormData({ ...formData, widthCm: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Alto (cm)</label>
+                                <input
+                                    type="number"
+                                    placeholder="Ej: 10"
+                                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-coral/20 outline-none font-medium transition-all"
+                                    value={formData.heightCm}
+                                    onChange={(e) => setFormData({ ...formData, heightCm: e.target.value })}
+                                />
+                            </div>
                         </div>
                     </div>
 

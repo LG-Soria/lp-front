@@ -119,5 +119,79 @@ export const apiService = {
             },
         });
         if (!response.ok) throw new Error('Error uploading file to R2');
+    },
+
+    // Envío
+    async getShippingQuotes(postalCode: string, items: { productId: string; quantity: number }[]): Promise<{ quotes: any[] }> {
+        const response = await fetch(`${API_BASE_URL}/shipping/quote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postalCode, items }),
+        });
+        return handleResponse(response);
+    },
+
+    // Checkout
+    async createCheckout(data: any): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/checkout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return handleResponse(response);
+    },
+
+    // Pagos
+    async createMPPreference(orderId: string): Promise<{ mpPreferenceId: string; initPointUrl: string }> {
+        const response = await fetch(`${API_BASE_URL}/payments/mercadopago/create-preference`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId }),
+        });
+        return handleResponse(response);
+    },
+
+    // Consultas/Pedidos (Tipo PEDIDO)
+    async createRequest(data: any): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/requests`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return handleResponse(response);
+    },
+
+    // Admin - Pedidos (STOCK)
+    async getAdminOrders(params: any = {}): Promise<any> {
+        const query = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/admin/orders?${query}`, {
+            headers: getAuthHeaders(),
+        });
+        return handleResponse(response);
+    },
+
+    // Admin - Consultas (PEDIDO)
+    async getAdminRequests(params: any = {}): Promise<any> {
+        const query = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/admin/requests?${query}`, {
+            headers: getAuthHeaders(),
+        });
+        return handleResponse(response);
+    },
+
+    async getAdminRequestById(id: string): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/admin/requests/${id}`, {
+            headers: getAuthHeaders(),
+        });
+        return handleResponse(response);
+    },
+
+    async updateAdminRequestStatus(id: string, status: string): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/admin/requests/${id}/status`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status }),
+        });
+        return handleResponse(response);
     }
 };

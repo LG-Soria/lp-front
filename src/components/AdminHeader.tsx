@@ -13,6 +13,8 @@ export const AdminHeader: React.FC = () => {
         { name: 'Inicio', href: '/admin' },
         { name: 'Productos', href: '/admin/productos' },
         { name: 'Categorías', href: '/admin/categorias' },
+        { name: 'Pedidos', href: '/admin/pedidos' },
+        { name: 'Consultas', href: '/admin/consultas' },
     ];
 
     return (
