@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { SmileyFlowerDoodle, StarDoodle } from './doodles';
+import { OptimizedImage } from './OptimizedImage';
 
 export const Footer: React.FC = () => {
   return (
@@ -11,10 +12,12 @@ export const Footer: React.FC = () => {
 
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left relative z-10">
         <div className="space-y-6">
-          <img
+          <OptimizedImage
             src="/logo.png"
             alt="Locas Puntadas Logo"
             className="h-16 w-auto object-contain mx-auto md:mx-0"
+            width={200}
+            height={64}
           />
           <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto md:mx-0 font-medium">
             Piezas artesanales tejidas a mano. Productos únicos hechos con tiempo, dedicación y mucha alma.

@@ -9,6 +9,8 @@ import { SpeechBubble, StarDoodle, WavyLine, TapeDoodle, HeartDoodle } from '@/c
  */
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
 
+import { OptimizedImage } from '@/components/OptimizedImage';
+
 export default function InfoPage() {
     return (
         <div className="bg-wavy-grid min-h-screen py-24 px-4 overflow-hidden">
@@ -21,10 +23,11 @@ export default function InfoPage() {
                         <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-3xl -z-10 group-hover:scale-125 transition-transform duration-700"></div>
 
                         {/* Imagen de Ricky */}
-                        <img
+                        <OptimizedImage
                             src={RICKY_URL}
                             alt="Ricky el ovillo con zapatillas"
                             className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.15)] floating-doodle"
+                            priority={true}
                         />
                         <StarDoodle className="absolute top-0 right-0 w-16 h-16 text-yellow-500 z-10" />
                     </div>

@@ -5,6 +5,7 @@ import { Product, Category, ProductType } from '@/types';
 import { apiService } from '@/services/apiService';
 import { StarDoodle, SmileyFlowerDoodle, TapeDoodle } from '@/components/doodles';
 import Toast from '@/components/ui/Toast';
+import { OptimizedImage } from '../OptimizedImage';
 
 interface ProductModalProps {
     product: Product | null;
@@ -331,7 +332,7 @@ export default function ProductModal({ product, categories, isOpen, onClose, onS
                                 {formData.imagenes?.map((img, index) => (
                                     img && (
                                         <div key={index} className="relative aspect-square rounded-[24px] overflow-hidden group border-2 border-white shadow-sm hover:shadow-md transition-all">
-                                            <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                            <OptimizedImage src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
                                                 onClick={() => {

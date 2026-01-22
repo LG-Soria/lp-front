@@ -74,7 +74,7 @@ export default function Toast({ message, type = 'error', duration = 5000, onClos
                     </button>
                 </div>
 
-                <div className="absolute -right-6 -bottom-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rotate-12">
+                <div className="absolute -right-6 -bottom-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rotate-12 pointer-events-none">
                     <SmileyFlowerDoodle className="w-24 h-24" />
                 </div>
             </div>

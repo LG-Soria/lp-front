@@ -1,7 +1,6 @@
 export enum ProductType {
   STOCK = 'STOCK',
-  PEDIDO = 'PEDIDO',
-  PERSONALIZADO = 'PERSONALIZADO'
+  PEDIDO = 'PEDIDO'
 }
 
 export enum OrderStatus {
@@ -60,4 +59,14 @@ export interface HomeConfig {
   id: string;
   heroImageUrl: string | null;
   featuredProductIds: string[];
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }

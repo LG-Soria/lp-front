@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiService } from '@/services/apiService';
 import { Product } from '@/types';
+import { OptimizedImage } from './OptimizedImage';
 
 interface SearchDrawerProps {
     isOpen: boolean;
@@ -96,10 +97,11 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="flex flex-col items-center text-center">
-                            <img
+                            <OptimizedImage
                                 src="/logo.png"
                                 alt="Locas Puntadas"
                                 className="h-16 w-auto object-contain mb-3"
+                                priority={true}
                             />
                             <h2 className="text-2xl font-serif italic text-gray-800 mb-6">Búsqueda</h2>
 
@@ -155,7 +157,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                                     >
                                         <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100">
                                             {product.imagenes && product.imagenes.length > 0 ? (
-                                                <img
+                                                <OptimizedImage
                                                     src={product.imagenes[0]}
                                                     alt={product.nombre}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

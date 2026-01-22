@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
 
+import { OptimizedImage } from './OptimizedImage';
+
 export const AdminHeader: React.FC = () => {
     const { user, logout } = useAuth();
     const pathname = usePathname();
@@ -22,10 +24,11 @@ export const AdminHeader: React.FC = () => {
             <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
                 <div className="flex items-center gap-12">
                     <Link href="/admin" className="flex items-center gap-2 group">
-                        <img
+                        <OptimizedImage
                             src="/logo.png"
                             alt="Locas Puntadas Logo"
                             className="h-10 w-auto object-contain"
+                            priority={true}
                         />
                         <span className="bg-coral/10 text-coral text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest mt-1">Admin</span>
                     </Link>

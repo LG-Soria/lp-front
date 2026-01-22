@@ -1,4 +1,4 @@
-import { Product, Category } from '@/types';
+import { Product, Category, PaginatedResponse } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -32,9 +32,16 @@ const handleResponse = async (response: Response) => {
 
 export const apiService = {
     // Productos
-    async getProducts(): Promise<Product[]> {
-        const response = await fetch(`${API_BASE_URL}/products`);
-        return handleResponse(response).catch(() => []);
+    async getProducts(params: any = {}): Promise<PaginatedResponse<Product>> {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value.toString());
+            }
+        });
+        const queryString = query.toString();
+        const response = await fetch(`${API_BASE_URL}/products${queryString ? `?${queryString}` : ''}`);
+        return handleResponse(response).catch(() => ({ items: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }));
     },
 
     async getProductById(id: string): Promise<Product | null> {

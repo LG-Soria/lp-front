@@ -5,6 +5,7 @@ import { ProductType } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { apiService } from '@/services/apiService';
 import Link from 'next/link';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 export default function CheckoutPage() {
     const { cart: items, clearCart } = useCart();
@@ -338,7 +339,7 @@ export default function CheckoutPage() {
                                 <div key={item.id} className="flex justify-between text-sm items-center">
                                     <div className="flex gap-3 items-center">
                                         <div className="w-10 h-10 bg-gray-50 rounded overflow-hidden">
-                                            {item.imagenes?.[0] && <img src={item.imagenes[0]} alt={item.nombre} className="w-full h-full object-cover" />}
+                                            {item.imagenes?.[0] && <OptimizedImage src={item.imagenes[0]} alt={item.nombre} className="w-full h-full object-cover" />}
                                         </div>
                                         <span className="text-gray-600 font-medium">{item.quantity}x {item.nombre}</span>
                                     </div>

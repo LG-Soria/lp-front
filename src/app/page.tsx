@@ -1,47 +1,33 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { apiService } from '@/services/apiService';
 import { Product, ProductType, Category, HomeConfig } from '@/types';
 import { StarDoodle, TapeDoodle, StickerDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, ShoppingBagDoodle, SpeechBubble } from '@/components/doodles';
-import { WavyCheckerboardBackground } from '@/components/background/WavyCheckerboardBg';
+import { OptimizedImage } from '@/components/OptimizedImage';
+import { ClientWavyBackground } from '@/components/background/ClientWavyBackground';
 
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
 
-export default function HomePage() {
-  const [products, setProducts] = React.useState<Product[]>([]);
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [config, setConfig] = React.useState<HomeConfig | null>(null);
-  const [loading, setLoading] = React.useState(true);
+export default async function HomePage() {
+  const [productsData, categories, config] = await Promise.all([
+    apiService.getProducts(),
+    apiService.getCategories(),
+    apiService.getHomeConfig()
+  ]);
 
-  React.useEffect(() => {
-    Promise.all([
-      apiService.getProducts(),
-      apiService.getCategories(),
-      apiService.getHomeConfig()
-    ]).then(([productsData, categoriesData, configData]) => {
-      setProducts(productsData);
-      setCategories(categoriesData);
-      setConfig(configData);
-      setLoading(false);
-    });
-  }, []);
+  const products = productsData.items;
 
-  // Memoizar el array de productos destacados
-  const featured = React.useMemo(() => {
-    if (!config || !config.featuredProductIds || config.featuredProductIds.length === 0) {
-      return products.slice(0, 3);
-    }
-    return config.featuredProductIds
-      .map(id => products.find(p => p.id === id))
-      .filter((p): p is Product => !!p);
-  }, [products, config]);
+  // Determinar los productos destacados
+  const featured = !config || !config.featuredProductIds || config.featuredProductIds.length === 0
+    ? products.slice(0, 3)
+    : config.featuredProductIds
+      .map((id: string) => products.find(p => p.id === id))
+      .filter((p: Product | undefined): p is Product => !!p);
 
 
   return (
     <div className="space-y-32 pb-24 ">
-      <WavyCheckerboardBackground />
+      <ClientWavyBackground />
       {/* Hero Section: Presentación de la marca */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         {/* Misceláneas de fondo para el look artesanal */}
@@ -83,10 +69,11 @@ export default function HomePage() {
           {/* Imagen del Hero con rotación orgánica */}
           <div className="relative mx-auto lg:ml-auto max-w-md lg:max-w-none">
             <div className="relative z-10 rounded-[40px] overflow-hidden border-8 border-white shadow-2xl rotate-2">
-              <img
+              <OptimizedImage
                 src={config?.heroImageUrl || "https://images.unsplash.com/photo-1544457070-4cd773b4d71e?q=80&w=1000&auto=format&fit=crop"}
                 className="w-full h-[600px] object-cover"
                 alt="Tejido artesanal"
+                priority={true}
               />
             </div>
             <SmileyFlowerDoodle className="absolute -top-12 -right-12 w-64 h-64 -z-10 rotate-12" />
@@ -108,7 +95,7 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-48">
-          {featured.map((product, index) => {
+          {featured.map((product: Product, index: number) => {
             const isEven = index % 2 === 0;
             const stickerTexts = ['Novedades', 'Best Seller', 'Locamente Favoritos'];
             const stickerColors = ['#FB7185', '#7C3AED', '#F472B6'];
@@ -129,7 +116,7 @@ export default function HomePage() {
               >
                 <div className={`relative w-full max-w-[400px] shrink-0`}>
                   <div className={`relative z-10 aspect-3/4 overflow-hidden rounded-full border-12 border-white shadow-2xl transform ${isEven ? 'rotate-2' : '-rotate-2'} group-hover:rotate-0 ${shadowClasses[index % 3]} transition-all duration-700`}>
-                    <img
+                    <OptimizedImage
                       src={product.imagenes[0]}
                       alt={product.nombre}
                       className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
@@ -230,7 +217,7 @@ export default function HomePage() {
           {/* Ricky Image */}
           <div className="w-64 h-64 lg:w-72 lg:h-72 shrink-0 relative group">
             <div className="absolute inset-0 bg-coral/10 rounded-full blur-3xl -z-10 group-hover:scale-125 transition-transform duration-700"></div>
-            <img
+            <OptimizedImage
               src={RICKY_URL}
               alt="Ricky el ovillo"
               className="w-full h-full object-contain drop-shadow-2xl floating-doodle"

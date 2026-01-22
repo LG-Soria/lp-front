@@ -1,44 +1,23 @@
-'use client';
-
-import React, { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
 import Link from 'next/link';
 import { apiService } from '@/services/apiService';
 import { Product, ProductType } from '@/types';
-import { SmileyFlowerDoodle, StarDoodle, TapeDoodle, StickerDoodle, HeartDoodle, WavyLine } from '@/components/doodles';
-import { WavyCheckerboardBackground } from '@/components/background/WavyCheckerboardBg';
-import { useCart } from '@/context/CartContext';
+import { SmileyFlowerDoodle, StarDoodle, WavyLine } from '@/components/doodles';
+import dynamic from 'next/dynamic';
 import { PersonalizableBanner } from '@/components/PersonalizableBanner';
+import { ProductImageGallery } from '@/components/ProductDetail/ProductImageGallery';
+import { ProductActions } from '@/components/ProductDetail/ProductActions';
+import { ClientWavyBackground } from '@/components/background/ClientWavyBackground';
 
-export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
-    const router = useRouter();
-    const { addToCart } = useCart();
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
 
-    const [product, setProduct] = useState<Product | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [selectedImg, setSelectedImg] = useState(0);
-
-    useEffect(() => {
-        apiService.getProductById(id).then(data => {
-            setProduct(data);
-            setLoading(false);
-        });
-    }, [id]);
-
-    if (loading) {
-        return (
-            <div className="relative min-h-screen flex items-center justify-center">
-                <WavyCheckerboardBackground />
-                <div className="w-16 h-16 border-4 border-coral border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
-    }
+    const product = await apiService.getProductById(id);
 
     if (!product) {
         return (
             <div className="relative min-h-screen flex flex-col items-center justify-center">
-                <WavyCheckerboardBackground />
+                <ClientWavyBackground />
                 <div className="bg-white p-12 rounded-[40px] shadow-2xl rotate-2 relative z-10">
                     <h2 className="text-3xl font-heading mb-6">Ups, el producto no está</h2>
                     <Link href="/categorias" className="text-coral font-bold underline text-xl">Volver al catálogo</Link>
@@ -46,15 +25,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
         );
     }
-
-    const handleAction = () => {
-        if (product.tipo === ProductType.PERSONALIZADO) {
-            window.open('https://wa.me/123456789', '_blank');
-        } else {
-            addToCart(product);
-            router.push('/carrito');
-        }
-    };
 
     const getBadgeInfo = () => {
         // Priorizar etiqueta personalizada si existe
@@ -70,7 +40,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         switch (product.tipo) {
             case ProductType.STOCK: return { text: 'Stock', color: '#10B981' };
             case ProductType.PEDIDO: return { text: 'A pedido', color: '#8B5CF6' };
-            case ProductType.PERSONALIZADO: return { text: 'Único', color: '#dc1537' };
             default: return { text: 'Artesanal', color: '#dc1537' };
         }
     };
@@ -79,7 +48,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
     return (
         <div className="min-h-screen relative py-20 px-4 md:px-12 lg:px-24">
-            <WavyCheckerboardBackground />
+            <ClientWavyBackground />
 
             {/* Navegación sutil */}
             <div className="container mx-auto max-w-7xl mb-12 relative z-20">
@@ -101,43 +70,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
 
                         {/* Columna de Imagen - Estilo Foto Pegada */}
-                        <div className="p-8 md:p-12 lg:p-16 flex flex-col items-center justify-start bg-rosa-pastel/5 border-r border-rosa-pastel/10 lg:rounded-l-[52px]">
-                            <div className="relative w-full group">
-                                <TapeDoodle color="#e9bbff" className="absolute -top-4 -left-6 z-30 -rotate-45 w-24" />
-                                <TapeDoodle color="#f89eb6" className="absolute -bottom-4 -right-6 z-30 -rotate-45 w-24" />
-
-                                <div className="relative aspect-4/5 rounded-[32px] overflow-hidden bg-white border-12 border-white shadow-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-700">
-                                    <img
-                                        src={product.imagenes[selectedImg]}
-                                        alt={product.nombre}
-                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    />
-
-                                    <StickerDoodle
-                                        text={badge.text}
-                                        color={badge.color}
-                                        className="absolute top-4 right-4 z-30 scale-125 rotate-12"
-                                    />
-                                </div>
-
-                                <HeartDoodle className="absolute -bottom-10 -left-10 w-24 h-24 text-coral opacity-20 hidden md:block" />
-                            </div>
-
-                            {/* Selector de imágenes (Miniaturas) */}
-                            {product.imagenes.length > 1 && (
-                                <div className="mt-12 flex flex-wrap gap-4 w-full justify-center">
-                                    {product.imagenes.map((img, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setSelectedImg(idx)}
-                                            className={`w-20 h-20 rounded-2xl border-4 shadow-md overflow-hidden shrink-0 rotate-2 hover:rotate-0 transition-all ${selectedImg === idx ? 'border-coral scale-110 rotate-0 z-10' : 'border-white opacity-70'}`}
-                                        >
-                                            <img src={img} className="w-full h-full object-cover" alt={`Miniatura ${idx + 1}`} />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <ProductImageGallery imagenes={product.imagenes} nombre={product.nombre} badge={badge} />
 
                         {/* Columna de Contenido */}
                         <div className="p-8 md:p-12 lg:p-16 flex flex-col">
@@ -178,7 +111,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                 {product.personalizable && (
                                     <PersonalizableBanner
                                         productName={product.nombre}
-                                        productUrl={typeof window !== 'undefined' ? window.location.href : ''}
+                                        productUrl=""
                                     />
                                 )}
 
@@ -199,27 +132,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                             </div>
 
                             {/* Acciones Finales */}
-                            <div className="space-y-6">
-                                <button
-                                    onClick={handleAction}
-                                    className="w-full group relative overflow-hidden bg-coral text-white py-6 rounded-full font-bold text-2xl shadow-xl shadow-rose-200/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                >
-                                    <span className="relative z-10">
-                                        {product.tipo === ProductType.PERSONALIZADO ? 'Consultar diseño' : 'Lo quiero para mí'}
-                                    </span>
-                                    <div className="absolute inset-0 bg-coral-dark translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                                </button>
-
-                                <div className="flex items-center justify-center gap-6">
-                                    <a
-                                        href="https://wa.me/123456789"
-                                        className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 transition-all flex items-center gap-2 hover:text-coral"
-                                    >
-                                        ¿Tenés dudas? Escribinos
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                                    </a>
-                                </div>
-                            </div>
+                            <ProductActions product={product} />
                         </div>
                     </div>
                 </div>

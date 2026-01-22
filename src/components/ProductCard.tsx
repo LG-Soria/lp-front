@@ -4,13 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { Product, ProductType } from '@/types';
 import { TapeDoodle, StarDoodle } from './doodles';
+import { OptimizedImage } from './OptimizedImage';
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
-  const isPersonalizado = product.tipo === ProductType.PERSONALIZADO;
   const isPedido = product.tipo === ProductType.PEDIDO;
 
   // Memoizar el color de la categoría para evitar recálculo
@@ -52,10 +52,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
             href={`/producto/${product.id}`}
             className="relative block overflow-hidden rounded-2xl bg-gray-50 aspect-4/5 border-4 border-white shadow-inner transform -rotate-1 group-hover:rotate-0 transition-transform duration-500"
           >
-            <img
+            <OptimizedImage
               src={product.imagenes[0]}
               alt={product.nombre}
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             />
 
             {/* Overlay de textura de papel sutil */}
@@ -72,11 +73,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
             {isPedido && (
               <span className="bg-purple-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg rotate-6 group-hover:rotate-0 transition-transform block">
                 A Pedido
-              </span>
-            )}
-            {isPersonalizado && (
-              <span className="bg-coral text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-12 group-hover:rotate-0 transition-transform block">
-                Único
               </span>
             )}
           </div>

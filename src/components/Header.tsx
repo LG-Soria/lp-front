@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
-import SearchDrawer from './SearchDrawer';
-import MobileMenu from './MobileMenu';
+import dynamic from 'next/dynamic';
+import { OptimizedImage } from './OptimizedImage';
+
+const SearchDrawer = dynamic(() => import('./SearchDrawer'), { ssr: false });
+const MobileMenu = dynamic(() => import('./MobileMenu'), { ssr: false });
 
 interface HeaderProps {
   cartCount: number;
@@ -32,10 +35,13 @@ export const Header: React.FC<HeaderProps> = ({ cartCount }) => {
             </button>
 
             <Link href="/" className="flex items-center gap-2">
-              <img
+              <OptimizedImage
                 src="/logo.png"
                 alt="Locas Puntadas Logo"
                 className="h-10 md:h-12 w-auto object-contain"
+                width={200}
+                height={50}
+                priority={true}
               />
             </Link>
 

@@ -10,6 +10,8 @@ interface OptimizedImageProps {
     priority?: boolean;
     fill?: boolean;
     sizes?: string;
+    width?: number;
+    height?: number;
     objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
@@ -24,6 +26,8 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
     priority = false,
     fill = false,
     sizes,
+    width,
+    height,
     objectFit = 'cover',
 }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +45,8 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                     src={src}
                     alt={alt}
                     className={className}
+                    width={width}
+                    height={height}
                     loading={priority ? 'eager' : 'lazy'}
                     onLoad={() => setIsLoading(false)}
                     style={{ objectFit }}
@@ -61,6 +67,8 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                 className={className}
                 priority={priority}
                 fill={fill}
+                width={!fill ? width : undefined}
+                height={!fill ? height : undefined}
                 sizes={sizes}
                 onLoad={() => setIsLoading(false)}
                 style={{ objectFit }}

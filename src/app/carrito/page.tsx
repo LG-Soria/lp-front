@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ProductType } from '@/types';
 import { ShoppingBagDoodle } from '@/components/doodles';
 import { useCart } from '@/context/CartContext';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 export default function CartPage() {
     const router = useRouter();
@@ -40,7 +41,7 @@ export default function CartPage() {
                 {items.map(item => (
                     <div key={item.id} className="flex flex-col sm:flex-row gap-6 p-6 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
                         <div className="w-full sm:w-32 h-32 bg-gray-50 rounded-2xl overflow-hidden shrink-0">
-                            <img src={item.imagenes[0]} alt={item.nombre} className="w-full h-full object-cover" />
+                            <OptimizedImage src={item.imagenes[0]} alt={item.nombre} className="w-full h-full object-cover" />
                         </div>
                         <div className="grow flex flex-col justify-between">
                             <div className="flex justify-between items-start">
