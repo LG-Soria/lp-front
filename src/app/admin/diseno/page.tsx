@@ -32,7 +32,7 @@ export default function HomeConfigPage() {
                 apiService.getProducts()
             ]);
             setConfig(configData);
-            setProducts(productsData);
+            setProducts(productsData.items);
             setDraftHeroImageUrl(configData.heroImageUrl);
             setDraftFeaturedIds(configData.featuredProductIds || []);
         } catch (err) {
