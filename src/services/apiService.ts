@@ -42,6 +42,14 @@ export const apiService = {
         return handleResponse(response).catch(() => null);
     },
 
+    async searchProducts(query: string): Promise<Product[]> {
+        if (!query || query.trim() === '') {
+            return [];
+        }
+        const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}`);
+        return handleResponse(response).catch(() => []);
+    },
+
     async createProduct(product: Partial<Product>): Promise<Product> {
         const response = await fetch(`${API_BASE_URL}/products`, {
             method: 'POST',
@@ -191,6 +199,32 @@ export const apiService = {
             method: 'PATCH',
             headers: getAuthHeaders(),
             body: JSON.stringify({ status }),
+        });
+        return handleResponse(response);
+    },
+
+    // Admin - Pedidos (STOCK) Detalles
+    async getAdminOrderById(id: string): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/admin/orders/${id}`, {
+            headers: getAuthHeaders(),
+        });
+        return handleResponse(response);
+    },
+
+    async updateAdminOrderStatus(id: string, status: string): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/admin/orders/${id}/status`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status }),
+        });
+        return handleResponse(response);
+    },
+
+    async updateAdminOrderTracking(id: string, trackingCard: { trackingCode?: string; trackingUrl?: string }): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/admin/orders/${id}/tracking`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(trackingCard),
         });
         return handleResponse(response);
     }

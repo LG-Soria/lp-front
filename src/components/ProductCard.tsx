@@ -65,20 +65,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Badge de Estado como Sticker */}
           <div className="absolute -bottom-3 -right-2 z-20">
-            {product.tipo === ProductType.STOCK && (
-              <span className="bg-green-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-6 group-hover:rotate-0 transition-transform block">
-                Stock
+            {product.label ? (
+              <span className={`text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg block ${product.label === 'Novedades' ? 'bg-rose-400 -rotate-6' :
+                product.label === 'Best Seller' ? 'bg-purple-500 rotate-3' :
+                  'bg-rosa-empolvado -rotate-12'
+                }`}>
+                {product.label}
               </span>
-            )}
-            {isPedido && (
-              <span className="bg-purple-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg rotate-6 group-hover:rotate-0 transition-transform block">
-                Pedido
-              </span>
-            )}
-            {isPersonalizado && (
-              <span className="bg-coral text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-12 group-hover:rotate-0 transition-transform block">
-                Personalizado
-              </span>
+            ) : (
+              <>
+                {product.tipo === ProductType.STOCK && (
+                  <span className="bg-green-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-6 group-hover:rotate-0 transition-transform block">
+                    Stock
+                  </span>
+                )}
+                {isPedido && (
+                  <span className="bg-purple-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg rotate-6 group-hover:rotate-0 transition-transform block">
+                    A Pedido
+                  </span>
+                )}
+                {isPersonalizado && (
+                  <span className="bg-coral text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-12 group-hover:rotate-0 transition-transform block">
+                    Único
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>

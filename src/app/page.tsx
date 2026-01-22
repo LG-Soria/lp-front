@@ -91,16 +91,16 @@ export default function HomePage() {
         <div className="text-center mb-32 relative">
           <WavyLine className="absolute -top-8 left-1/2 -translate-x-1/2 w-48 text-coral opacity-30" />
           <h2 className="text-5xl md:text-6xl font-heading font-bold relative inline-block text-gray-900">
-            Favoritos de la <span className="font-script text-coral">casa</span>
+            Locamente <span className="font-script text-coral">Favoritos</span>
             <StarDoodle className="absolute -top-6 -right-12 w-10 h-10 text-rosa-empolvado opacity-80 rotate-12" />
           </h2>
-          <p className="text-gray-500 font-medium mt-4">Nuestras joyitas tejidas, elegidas por ustedes.</p>
+          <p className="text-gray-500 font-medium mt-4">Nuestras creaciones más mimadas</p>
         </div>
 
         <div className="space-y-48">
           {featured.map((product, index) => {
             const isEven = index % 2 === 0;
-            const stickerTexts = ['Best seller', 'Hecho hoy', 'Favorito'];
+            const stickerTexts = ['Novedades', 'Best Seller', 'Locamente Favoritos'];
             const stickerColors = ['#FB7185', '#7C3AED', '#F472B6'];
 
             const stickerText = product.label || stickerTexts[index % stickerTexts.length];

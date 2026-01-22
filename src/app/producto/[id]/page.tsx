@@ -57,9 +57,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     };
 
     const getBadgeInfo = () => {
+        // Priorizar etiqueta personalizada si existe
+        if (product.label) {
+            switch (product.label) {
+                case 'Novedades': return { text: 'Novedades', color: '#FB7185' };
+                case 'Best Seller': return { text: 'Best Seller', color: '#7C3AED' };
+                case 'Locamente Favoritos': return { text: 'Favorito', color: '#F472B6' };
+                default: return { text: product.label, color: '#dc1537' };
+            }
+        }
+
         switch (product.tipo) {
             case ProductType.STOCK: return { text: 'Stock', color: '#10B981' };
-            case ProductType.PEDIDO: return { text: 'Hecho hoy', color: '#8B5CF6' };
+            case ProductType.PEDIDO: return { text: 'A pedido', color: '#8B5CF6' };
             case ProductType.PERSONALIZADO: return { text: 'Único', color: '#dc1537' };
             default: return { text: 'Artesanal', color: '#dc1537' };
         }

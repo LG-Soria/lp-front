@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { apiService } from '@/services/apiService';
 import { Category, ProductType } from '@/types';
 import { StarDoodle, SmileyFlowerDoodle, TapeDoodle } from '@/components/doodles';
+import Toast from '@/components/ui/Toast';
 
 export default function ProductFormPage() {
     const router = useRouter();
@@ -30,6 +31,7 @@ export default function ProductFormPage() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(isEditing);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         loadCategories();
@@ -81,9 +83,13 @@ export default function ProductFormPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError(null);
+
+        // Clean payload: Remove read-only or extra fields
+        const { displayPrecio, id, precioCents, currency, createdAt, updatedAt, category, ...cleanData } = formData as any;
 
         const payload = {
-            ...formData,
+            ...cleanData,
             precio: formData.precio ? parseFloat(formData.precio) : null,
             imagenes: formData.imagenes.filter(img => img.trim() !== ''),
             weightGrams: formData.weightGrams ? parseInt(formData.weightGrams) : null,
@@ -91,8 +97,6 @@ export default function ProductFormPage() {
             widthCm: formData.widthCm ? parseInt(formData.widthCm) : null,
             heightCm: formData.heightCm ? parseInt(formData.heightCm) : null
         };
-        // Remove display field from payload
-        delete (payload as any).displayPrecio;
 
         console.log('Enviando payload al backend:', JSON.stringify(payload, null, 2));
 
@@ -104,21 +108,12 @@ export default function ProductFormPage() {
             }
             router.push('/admin/productos');
         } catch (error: any) {
-            alert('Error al guardar el producto: ' + error.message);
+            setError(error.message || 'Error al guardar el producto');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleImageChange = (index: number, value: string) => {
-        const newImages = [...formData.imagenes];
-        newImages[index] = value;
-        setFormData({ ...formData, imagenes: newImages });
-    };
-
-    const addImageField = () => {
-        setFormData({ ...formData, imagenes: [...formData.imagenes, ''] });
-    };
 
     if (isFetching) {
         return <div className="p-8 text-center">Cargando producto...</div>;
@@ -236,9 +231,9 @@ export default function ProductFormPage() {
                                         onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                                     >
                                         <option value="">Ninguna</option>
+                                        <option value="Novedades">Novedades</option>
                                         <option value="Best Seller">Best Seller</option>
-                                        <option value="Hecho Hoy">Hecho Hoy</option>
-                                        <option value="Favorito">Favorito de la Casa</option>
+                                        <option value="Locamente Favoritos">Locamente Favoritos</option>
                                     </select>
                                 </div>
 
@@ -388,28 +383,6 @@ export default function ProductFormPage() {
                             </label>
                         </div>
 
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">URLs Manuales</label>
-                            {formData.imagenes.map((img, index) => (
-                                <div key={index} className="relative">
-                                    <input
-                                        type="text"
-                                        placeholder="https://su-imagen.com/foto.jpg"
-                                        className="w-full pl-6 pr-12 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-coral/20 outline-none text-sm font-medium transition-all"
-                                        value={img}
-                                        onChange={(e) => handleImageChange(index, e.target.value)}
-                                    />
-                                    <TapeDoodle className="absolute -right-4 -top-2 scale-75 opacity-20 pointer-events-none" />
-                                </div>
-                            ))}
-                            <button
-                                type="button"
-                                onClick={addImageField}
-                                className="text-xs font-bold text-coral hover:underline uppercase tracking-widest"
-                            >
-                                + Agregar otro link
-                            </button>
-                        </div>
                     </div>
 
                     <div className="flex justify-end gap-6 pt-8">
@@ -430,6 +403,7 @@ export default function ProductFormPage() {
                     </div>
                 </form>
             </div>
+            {error && <Toast message={error} onClose={() => setError(null)} />}
         </div>
     );
 }
