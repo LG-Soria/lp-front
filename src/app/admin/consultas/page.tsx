@@ -151,7 +151,7 @@ export default function AdminRequestsPage() {
 
             {/* MODAL DETALLE */}
             {selectedRequest && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-fade-in">
+                <div className="fixed inset-0 z-60 flex items-center justify-center p-4 animate-fade-in">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setSelectedRequest(null)}></div>
                     <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-slide-up">
                         <div className="p-8">

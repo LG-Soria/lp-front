@@ -75,6 +75,19 @@ export default function AdminDashboardPage() {
                             </div>
                         </div>
                     </Link>
+
+                    <Link href="/admin/diseno" className="group">
+                        <div className="h-full bg-white p-10 rounded-[40px] shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden">
+                            <div className="absolute -top-6 -right-6 w-24 h-24 bg-coral/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 bg-coral/10 rounded-2xl flex items-center justify-center text-coral mb-8">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M12 8v8" /><path d="M8 12h8" /></svg>
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-3">Diseño Home</h2>
+                                <p className="text-gray-500 font-medium leading-relaxed">Configurá la imagen principal y los productos destacados de la portada.</p>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
             </div>
         </div>

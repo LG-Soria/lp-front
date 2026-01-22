@@ -9,32 +9,33 @@ interface ProductCardProps {
   product: Product;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
   const isPersonalizado = product.tipo === ProductType.PERSONALIZADO;
   const isPedido = product.tipo === ProductType.PEDIDO;
 
-  // Usamos el color de la categoría configurado en la base de datos para la cinta
-  const categoryColor = product.category?.color || '#9CA3AF'; // Gris por defecto
+  // Memoizar el color de la categoría para evitar recálculo
+  const categoryColor = React.useMemo(() =>
+    product.category?.color || '#9CA3AF',
+    [product.category?.color]
+  );
 
-  // Color de la cinta adhesiva: usa el color directo de la categoría
-  const getTapeColor = () => {
-    return categoryColor;
-  };
+  // Memoizar el color de la cinta
+  const tapeColor = React.useMemo(() => categoryColor, [categoryColor]);
 
-  // Colores de fondo decorativo hardcodeados (no cambian por categoría)
-  const getOffsetColor = () => {
+  // Memoizar el color de fondo decorativo
+  const offsetColor = React.useMemo(() => {
     switch (product.category?.nombre) {
       case 'Hogar': return 'bg-rosa-pastel';
       case 'Indumentaria': return 'bg-lila-suave';
       case 'Niños': return 'bg-orange-50';
       default: return 'bg-gray-50';
     }
-  };
+  }, [product.category?.nombre]);
 
   return (
     <div className="relative group perspective-1000">
       {/* Capa de fondo decorativa (Paper offset) */}
-      <div className={`absolute inset-0 ${getOffsetColor()} rounded-[32px] transform translate-x-2 translate-y-2 -rotate-2 group-hover:rotate-1 group-hover:translate-x-1 group-hover:translate-y-1 transition-all duration-500 opacity-60`}></div>
+      <div className={`absolute inset-0 ${offsetColor} rounded-[32px] transform translate-x-2 translate-y-2 -rotate-2 group-hover:rotate-1 group-hover:translate-x-1 group-hover:translate-y-1 transition-all duration-500 opacity-60`}></div>
 
       {/* Contenedor Principal de la Card */}
       <div className="relative flex flex-col h-full bg-white rounded-[32px] border border-gray-100 p-4 shadow-sm group-hover:shadow-xl group-hover:shadow-rose-100/30 transition-all duration-500 transform group-hover:-translate-y-2">
@@ -43,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="relative mb-6">
           {/* Cinta adhesiva que "pega" la foto */}
           <TapeDoodle
-            color={getTapeColor()}
+            color={tapeColor}
             className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-16 h-5 -rotate-2 group-hover:rotate-1 transition-transform"
           />
 
@@ -116,3 +117,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     </div>
   );
 };
+
+// Memoizar el componente para evitar re-renders innecesarios
+export const ProductCard = React.memo(ProductCardComponent);

@@ -55,3 +55,9 @@ export interface Product {
 export interface CartItem extends Product {
   quantity: number;
 }
+
+export interface HomeConfig {
+  id: string;
+  heroImageUrl: string | null;
+  featuredProductIds: string[];
+}

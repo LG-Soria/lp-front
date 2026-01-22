@@ -2,8 +2,9 @@ import React from 'react';
 /**
  * Componente de Fondo Wavy Checkerboard basado en el SVG exacto proporcionado
  * Colores: st0 -> #e9bbff (Lila suave), st1 -> #f89eb6 (Rosa vibrante)
+ * Optimizado con React.memo para evitar re-renders innecesarios
  */
-export const WavyCheckerboardBackground: React.FC = () => (
+const WavyCheckerboardBackgroundComponent: React.FC = () => (
   <div className="fixed inset-0 min-w-screen min-h-screen z-[-1] overflow-hidden pointer-events-none">
     <svg
       id="Layer_1"
@@ -107,3 +108,6 @@ export const WavyCheckerboardBackground: React.FC = () => (
     </svg>
   </div>
 );
+
+// Memoizar el componente para evitar re-renders del SVG pesado
+export const WavyCheckerboardBackground = React.memo(WavyCheckerboardBackgroundComponent);

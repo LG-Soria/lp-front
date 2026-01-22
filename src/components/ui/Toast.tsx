@@ -38,7 +38,7 @@ export default function Toast({ message, type = 'error', duration = 5000, onClos
     };
 
     return (
-        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-4 animate-in slide-in-from-bottom-5 duration-300 ${isExiting ? 'animate-out fade-out slide-out-to-bottom-5' : ''}`}>
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-100 w-full max-w-md px-4 animate-in slide-in-from-bottom-5 duration-300 ${isExiting ? 'animate-out fade-out slide-out-to-bottom-5' : ''}`}>
             <div className={`bg-white rounded-[28px] shadow-2xl p-5 border-2 ${type === 'error' ? 'border-rose-100' : 'border-green-100'} flex items-center gap-4 relative overflow-hidden group`}>
                 <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center ${type === 'error' ? 'bg-rose-50 text-coral' : 'bg-green-50 text-green-600'}`}>
                     {type === 'error' ? (

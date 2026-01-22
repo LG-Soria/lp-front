@@ -227,5 +227,20 @@ export const apiService = {
             body: JSON.stringify(trackingCard),
         });
         return handleResponse(response);
+    },
+
+    // Configuración de Home
+    async getHomeConfig(): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/home-config`);
+        return handleResponse(response);
+    },
+
+    async updateHomeConfig(data: any): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/home-config`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data),
+        });
+        return handleResponse(response);
     }
 };

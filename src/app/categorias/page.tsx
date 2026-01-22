@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { apiService } from '@/services/apiService';
 import { StarDoodle, StitchDivider, TapeDoodle, WavyLine, SmileyFlowerDoodle } from '@/components/doodles';
 import { Product, ProductType, Category } from '@/types';
@@ -11,7 +11,7 @@ export default function CategoryPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState<string>('Todas');
-    const [activeType, setActiveType] = useState<ProductType | null>(ProductType.STOCK);
+    const [activeType, setActiveType] = useState<ProductType | null>(null);
 
     useEffect(() => {
         Promise.all([
@@ -24,21 +24,27 @@ export default function CategoryPage() {
         });
     }, []);
 
-    // Filtrado combinado: Categoría + Tipo de disponibilidad
-    const filteredProducts = products.filter((product: Product) => {
-        const matchesCategory = activeCategory === 'Todas' || product.category?.nombre === activeCategory;
-        const matchesType = !activeType || product.tipo === activeType;
-        return matchesCategory && matchesType;
-    });
+    // Memoizar el filtrado para evitar recálculo en cada render
+    const filteredProducts = useMemo(() => {
+        return products.filter((product: Product) => {
+            const matchesCategory = activeCategory === 'Todas' || product.category?.nombre === activeCategory;
+            const matchesType = !activeType || product.tipo === activeType;
+            return matchesCategory && matchesType;
+        });
+    }, [products, activeCategory, activeType]);
 
-    const allCategoryNames = ['Todas', ...categories.map(c => c.nombre)];
+    // Memoizar el array de nombres de categorías
+    const allCategoryNames = useMemo(() =>
+        ['Todas', ...categories.map(c => c.nombre)],
+        [categories]
+    );
 
-    const handleTypeToggle = (type: ProductType) => {
-        setActiveType((prev: ProductType | null) => prev === type ? null : type);
-    };
+    const handleTypeChange = useCallback((type: ProductType | null) => {
+        setActiveType(type);
+    }, []);
 
-    // Generate dynamic styles for categories
-    const getCategoryStyle = (catName: string, index: number) => {
+    // Memoizar la función de estilos de categoría
+    const getCategoryStyle = useCallback((catName: string, index: number) => {
         const cat = categories.find(c => c.nombre === catName);
         const baseColor = cat?.color || '#FF69B4'; // Rosa por defecto
 
@@ -54,7 +60,7 @@ export default function CategoryPage() {
             bg: catName === 'Todas' ? 'bg-white' : 'bg-white',
             border: catName === 'Todas' ? 'border-gray-100' : `border-transparent`
         };
-    };
+    }, [categories]);
 
     return (
         <div className="container mx-auto px-8 md:px-16 lg:px-24 py-20 min-h-screen bg-doodle-dots relative">
@@ -119,7 +125,7 @@ export default function CategoryPage() {
 
                 {/* Filtro: En Stock */}
                 <button
-                    onClick={() => handleTypeToggle(ProductType.STOCK)}
+                    onClick={() => handleTypeChange(ProductType.STOCK)}
                     className={`flex items-center space-x-5 p-4 rounded-3xl transition-all duration-300 text-left group relative z-10
             ${activeType === ProductType.STOCK
                             ? 'bg-green-50/80 ring-2 ring-green-500 shadow-md translate-y-[-2px]'
@@ -139,7 +145,7 @@ export default function CategoryPage() {
 
                 {/* Filtro: Por Pedido */}
                 <button
-                    onClick={() => handleTypeToggle(ProductType.PEDIDO)}
+                    onClick={() => handleTypeChange(ProductType.PEDIDO)}
                     className={`flex items-center space-x-5 p-4 rounded-3xl transition-all duration-300 text-left group relative z-10
             ${activeType === ProductType.PEDIDO
                             ? 'bg-purple-50/80 ring-2 ring-purple-500 shadow-md translate-y-[-2px]'
@@ -157,11 +163,11 @@ export default function CategoryPage() {
                     </div>
                 </button>
 
-                {/* Filtro: Personalizado */}
+                {/* Filtro: Ambos */}
                 <button
-                    onClick={() => handleTypeToggle(ProductType.PERSONALIZADO)}
+                    onClick={() => handleTypeChange(null)}
                     className={`flex items-center space-x-5 p-4 rounded-3xl transition-all duration-300 text-left group relative z-10
-            ${activeType === ProductType.PERSONALIZADO
+            ${activeType === null
                             ? 'bg-rose-50/80 ring-2 ring-coral shadow-md translate-y-[-2px]'
                             : 'hover:bg-gray-50 opacity-70 hover:opacity-100'}`}
                 >
@@ -170,10 +176,10 @@ export default function CategoryPage() {
                     </div>
                     <div>
                         <p className="text-base font-bold text-gray-800 flex items-center gap-2">
-                            Personalizado
-                            {activeType === ProductType.PERSONALIZADO && <span className="w-2 h-2 bg-coral rounded-full animate-pulse"></span>}
+                            Ambos
+                            {activeType === null && <span className="w-2 h-2 bg-coral rounded-full animate-pulse"></span>}
                         </p>
-                        <p className="text-xs text-gray-400 font-medium">Diseños a tu medida.</p>
+                        <p className="text-xs text-gray-400 font-medium">Todas nuestras creaciones.</p>
                     </div>
                 </button>
             </div>
