@@ -151,7 +151,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                                     <button
                                         key={product.id}
                                         onClick={() => handleProductClick(product.id)}
-                                        className="w-full flex items-start gap-4 p-3 rounded-lg hover:bg-rosa-pastel/30 transition-colors text-left group"
+                                        className="w-full flex items-start gap-4 p-3 rounded-lg hover:bg-rosa-pastel/30 transition-colors text-left group cursor-pointer"
                                     >
                                         <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                                             {product.imagenes && product.imagenes.length > 0 ? (

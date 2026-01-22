@@ -183,26 +183,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                 )}
 
                                 {/* Detalles de producción estilo "Frosted Glass" con blur */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                                    <div className="bg-lila-suave/40 backdrop-blur-md p-6 rounded-[30px] border-2 border-dashed border-purple-300 transform -rotate-1 shadow-sm">
-                                        <h3 className="text-[11px] font-black text-purple-900 mb-3 uppercase tracking-widest flex items-center gap-2">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M12 2v20m10-10H2" /></svg>
-                                            Tiempo estimado
-                                        </h3>
-                                        <p className="text-sm text-purple-800 font-extrabold">
-                                            {product.tiempoProduccion}
-                                        </p>
+                                {product.tipo === ProductType.PEDIDO && product.tiempoProduccion && (
+                                    <div className="mb-12">
+                                        <div className="bg-lila-suave/40 backdrop-blur-md p-6 rounded-[30px] border-2 border-dashed border-purple-300 transform -rotate-1 shadow-sm">
+                                            <h3 className="text-[11px] font-black text-purple-900 mb-3 uppercase tracking-widest flex items-center gap-2">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M12 2v20m10-10H2" /></svg>
+                                                Tiempo estimado
+                                            </h3>
+                                            <p className="text-sm text-purple-800 font-extrabold">
+                                                {product.tiempoProduccion}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="bg-rose-50/40 backdrop-blur-md p-6 rounded-[30px] border-2 border-dashed border-rose-300 transform rotate-1 shadow-sm">
-                                        <h3 className="text-[11px] font-black text-rose-900 mb-3 uppercase tracking-widest flex items-center gap-2">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
-                                            Cuidado amoroso
-                                        </h3>
-                                        <p className="text-sm text-rose-800 font-bold italic">
-                                            Lavar a mano, secar plano.
-                                        </p>
-                                    </div>
-                                </div>
+                                )}
                             </div>
 
                             {/* Acciones Finales */}

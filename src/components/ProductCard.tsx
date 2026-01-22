@@ -13,23 +13,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const isPersonalizado = product.tipo === ProductType.PERSONALIZADO;
   const isPedido = product.tipo === ProductType.PEDIDO;
 
-  // Variamos los colores de fondo decorativo según la categoría
+  // Usamos el color de la categoría configurado en la base de datos para la cinta
+  const categoryColor = product.category?.color || '#9CA3AF'; // Gris por defecto
+
+  // Color de la cinta adhesiva: usa el color directo de la categoría
+  const getTapeColor = () => {
+    return categoryColor;
+  };
+
+  // Colores de fondo decorativo hardcodeados (no cambian por categoría)
   const getOffsetColor = () => {
     switch (product.category?.nombre) {
       case 'Hogar': return 'bg-rosa-pastel';
       case 'Indumentaria': return 'bg-lila-suave';
       case 'Niños': return 'bg-orange-50';
       default: return 'bg-gray-50';
-    }
-  };
-
-  // Variamos el color de la cinta adhesiva
-  const getTapeColor = () => {
-    switch (product.category?.nombre) {
-      case 'Hogar': return '#FB7185';
-      case 'Indumentaria': return '#7C3AED';
-      case 'Niños': return '#F59E0B';
-      default: return '#9CA3AF';
     }
   };
 
@@ -65,31 +63,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Badge de Estado como Sticker */}
           <div className="absolute -bottom-3 -right-2 z-20">
-            {product.label ? (
-              <span className={`text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg block ${product.label === 'Novedades' ? 'bg-rose-400 -rotate-6' :
-                product.label === 'Best Seller' ? 'bg-purple-500 rotate-3' :
-                  'bg-rosa-empolvado -rotate-12'
-                }`}>
-                {product.label}
+            {product.tipo === ProductType.STOCK && (
+              <span className="bg-green-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-6 group-hover:rotate-0 transition-transform block">
+                Stock
               </span>
-            ) : (
-              <>
-                {product.tipo === ProductType.STOCK && (
-                  <span className="bg-green-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-6 group-hover:rotate-0 transition-transform block">
-                    Stock
-                  </span>
-                )}
-                {isPedido && (
-                  <span className="bg-purple-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg rotate-6 group-hover:rotate-0 transition-transform block">
-                    A Pedido
-                  </span>
-                )}
-                {isPersonalizado && (
-                  <span className="bg-coral text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-12 group-hover:rotate-0 transition-transform block">
-                    Único
-                  </span>
-                )}
-              </>
+            )}
+            {isPedido && (
+              <span className="bg-purple-500 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg rotate-6 group-hover:rotate-0 transition-transform block">
+                A Pedido
+              </span>
+            )}
+            {isPersonalizado && (
+              <span className="bg-coral text-white text-[9px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-lg -rotate-12 group-hover:rotate-0 transition-transform block">
+                Único
+              </span>
             )}
           </div>
         </div>
