@@ -6,6 +6,7 @@ import { apiService } from '@/services/apiService';
 import { Product, HomeConfig } from '@/types';
 import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
 import Toast from '@/components/ui/Toast';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 export default function HomeConfigPage() {
     const router = useRouter();
@@ -29,12 +30,19 @@ export default function HomeConfigPage() {
         try {
             const [configData, productsData] = await Promise.all([
                 apiService.getHomeConfig(),
-                apiService.getProducts()
+                apiService.getEligibleFeaturedProducts()
             ]);
             setConfig(configData);
-            setProducts(productsData.items);
-            setDraftHeroImageUrl(configData.heroImageUrl);
-            setDraftFeaturedIds(configData.featuredProductIds || []);
+            setProducts(productsData);
+
+            // Sanitizar IDs de productos destacados: eliminar los que no existen
+            // o ya no tienen las etiquetas elegibles
+            const validFeaturedIds = (configData.featuredProductIds || []).filter((id: string) =>
+                productsData.some((p: Product) => p.id === id)
+            );
+
+            setDraftHeroImageUrl(configData.heroImageUrl ?? null);
+            setDraftFeaturedIds(validFeaturedIds);
         } catch (err) {
             console.error('Error loading data:', err);
             setError('Error al cargar la configuración');
@@ -43,12 +51,8 @@ export default function HomeConfigPage() {
         }
     };
 
-    // Filtrar productos que tengan las etiquetas destacadas
-    const eligibleProducts = products.filter(p =>
-        p.label === 'Novedades' ||
-        p.label === 'Best Seller' ||
-        p.label === 'Locamente Favoritos'
-    );
+    // Todos los productos que vienen de getEligibleFeaturedProducts son elegibles
+    const eligibleProducts = products;
 
     const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -59,7 +63,7 @@ export default function HomeConfigPage() {
             const { uploadUrl, publicUrl } = await apiService.getPresignedUrl(file.name, file.type);
             await apiService.uploadFileToR2(uploadUrl, file);
             setDraftHeroImageUrl(publicUrl);
-        } catch (err) {
+        } catch {
             setError('Error al subir la imagen del hero');
         } finally {
             setIsSaving(false);
@@ -74,7 +78,7 @@ export default function HomeConfigPage() {
             await apiService.updateHomeConfig({ heroImageUrl: draftHeroImageUrl });
             setSuccess('Imagen del Hero actualizada');
             await loadData();
-        } catch (err) {
+        } catch {
             setError('Error al guardar la imagen');
         } finally {
             setIsSaving(false);
@@ -109,7 +113,7 @@ export default function HomeConfigPage() {
             setSuccess('Productos destacados actualizados');
             await loadData();
             setIsEditingFeatured(false);
-        } catch (err) {
+        } catch {
             setError('Error al guardar la selección');
         } finally {
             setIsSaving(false);
@@ -177,10 +181,12 @@ export default function HomeConfigPage() {
 
                         <div className="relative aspect-video rounded-[32px] overflow-hidden border-8 border-white shadow-xl bg-gray-100 mx-auto max-w-3xl">
                             {draftHeroImageUrl ? (
-                                <img
+                                <OptimizedImage
                                     src={draftHeroImageUrl}
                                     alt="Hero Preview"
                                     className="w-full h-full object-cover"
+                                    width={1200}
+                                    height={675}
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-400 font-medium">
@@ -245,10 +251,12 @@ export default function HomeConfigPage() {
                                                 className={`relative aspect-square rounded-[32px] overflow-hidden border-4 transition-all group ${isSelected ? 'border-coral shadow-lg scale-105' : 'border-white hover:border-gray-100 grayscale-[0.5] opacity-60'
                                                     }`}
                                             >
-                                                <img
+                                                <OptimizedImage
                                                     src={product.imagenes[0]}
                                                     alt={product.nombre}
                                                     className="w-full h-full object-cover"
+                                                    width={400}
+                                                    height={400}
                                                 />
                                                 {isSelected && (
                                                     <div className="absolute inset-0 bg-coral/20 flex items-center justify-center">
@@ -292,7 +300,13 @@ export default function HomeConfigPage() {
                                             {idx + 1}
                                         </div>
                                         <div className="aspect-square rounded-[32px] overflow-hidden border-4 border-white shadow-md bg-white">
-                                            <img src={product.imagenes[0]} alt={product.nombre} className="w-full h-full object-cover" />
+                                            <OptimizedImage
+                                                src={product.imagenes[0]}
+                                                alt={product.nombre}
+                                                className="w-full h-full object-cover"
+                                                width={400}
+                                                height={400}
+                                            />
                                             <div className="absolute bottom-0 inset-x-0 p-4 bg-linear-to-t from-black/80 to-transparent">
                                                 <p className="text-white text-xs font-bold uppercase">{product.nombre}</p>
                                                 <p className="text-coral-light text-[10px] font-bold">{product.label}</p>
@@ -316,3 +330,5 @@ export default function HomeConfigPage() {
         </div>
     );
 }
+
+

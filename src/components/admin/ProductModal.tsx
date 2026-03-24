@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Product, Category, ProductType } from '@/types';
 import { apiService } from '@/services/apiService';
-import { StarDoodle, SmileyFlowerDoodle, TapeDoodle } from '@/components/doodles';
+import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
 import Toast from '@/components/ui/Toast';
 import { OptimizedImage } from '../OptimizedImage';
 
@@ -31,6 +31,11 @@ export default function ProductModal({ product, categories, isOpen, onClose, onS
     const [error, setError] = useState<string | null>(null);
     const [showDiscardWarning, setShowDiscardWarning] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
+
+    const getErrorMessage = (errorValue: unknown): string => {
+        if (errorValue instanceof Error) return errorValue.message;
+        return 'Ocurrio un error al guardar el producto';
+    };
 
     useEffect(() => {
         if (product && isOpen) {
@@ -81,19 +86,27 @@ export default function ProductModal({ product, categories, isOpen, onClose, onS
         setIsSaving(true);
         setError(null);
         try {
-            // Clean payload: Remove read-only or extra fields that the backend DTO doesn't allow
-            const { id, precioCents, currency, createdAt, updatedAt, category, ...cleanData } = formData as any;
-
-            const payload = {
-                ...cleanData,
-                imagenes: formData.imagenes?.filter(img => img.trim() !== '') || []
+            const payload: Partial<Product> = {
+                nombre: formData.nombre ?? '',
+                descripcion: formData.descripcion ?? null,
+                precio: formData.precio ?? null,
+                tipo: formData.tipo ?? ProductType.STOCK,
+                label: formData.label ?? null,
+                categoryId: formData.categoryId ?? '',
+                tiempoProduccion: formData.tiempoProduccion ?? null,
+                personalizable: formData.personalizable ?? false,
+                imagenes: formData.imagenes?.filter(img => img.trim() !== '') || [],
+                weightGrams: formData.weightGrams ?? null,
+                lengthCm: formData.lengthCm ?? null,
+                widthCm: formData.widthCm ?? null,
+                heightCm: formData.heightCm ?? null,
             };
 
             const updated = await apiService.updateProduct(product.id, payload);
             onSave(updated);
             onClose();
-        } catch (error: any) {
-            setError(error.message || 'Ocurrió un error al guardar el producto');
+        } catch (error: unknown) {
+            setError(getErrorMessage(error));
         } finally {
             setIsSaving(false);
         }
@@ -118,7 +131,7 @@ export default function ProductModal({ product, categories, isOpen, onClose, onS
                     imagenes: [...currentImages, ...newPublicUrls]
                 }));
             }
-        } catch (err) {
+        } catch {
             alert('Error al subir las imágenes');
         } finally {
             setIsLoadingImages(false);
@@ -437,3 +450,4 @@ export default function ProductModal({ product, categories, isOpen, onClose, onS
         </div>
     );
 }
+

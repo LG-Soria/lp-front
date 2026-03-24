@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "perf:lighthouse": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/lighthouse-batch.ps1"
   },
   "dependencies": {
     "next": "16.1.1",

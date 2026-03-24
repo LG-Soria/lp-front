@@ -1,18 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { apiService } from '@/services/apiService';
-import { Product, ProductType, Category, HomeConfig } from '@/types';
-import { StarDoodle, TapeDoodle, StickerDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, ShoppingBagDoodle, SpeechBubble } from '@/components/doodles';
+import { Product, ProductType } from '@/types';
+import { StarDoodle, TapeDoodle, StickerDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, SpeechBubble } from '@/components/doodles';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { ClientWavyBackground } from '@/components/background/ClientWavyBackground';
 
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
 
 export default async function HomePage() {
-  const [productsData, categories, config] = await Promise.all([
-    apiService.getProducts(),
-    apiService.getCategories(),
-    apiService.getHomeConfig()
+  const [productsData, config, eligibleProducts] = await Promise.all([
+    apiService.getProducts({ limit: 3 }),
+    apiService.getHomeConfig(),
+    apiService.getEligibleFeaturedProducts()
   ]);
 
   const products = productsData.items;
@@ -21,7 +21,7 @@ export default async function HomePage() {
   const featured = !config || !config.featuredProductIds || config.featuredProductIds.length === 0
     ? products.slice(0, 3)
     : config.featuredProductIds
-      .map((id: string) => products.find(p => p.id === id))
+      .map((id: string) => eligibleProducts.find(p => p.id === id))
       .filter((p: Product | undefined): p is Product => !!p);
 
 
@@ -74,6 +74,7 @@ export default async function HomePage() {
                 className="w-full h-[600px] object-cover"
                 alt="Tejido artesanal"
                 priority={true}
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
             <SmileyFlowerDoodle className="absolute -top-12 -right-12 w-64 h-64 -z-10 rotate-12" />
@@ -120,6 +121,7 @@ export default async function HomePage() {
                       src={product.imagenes[0]}
                       alt={product.nombre}
                       className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
+                      sizes="(max-width: 1024px) 90vw, 40vw"
                     />
                     <div className="absolute inset-0 bg-coral/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
@@ -146,7 +148,7 @@ export default async function HomePage() {
                   </div>
 
                   <p className="text-lg text-gray-600 leading-relaxed italic">
-                    "{product.descripcion}"
+                    &quot;{product.descripcion}&quot;
                   </p>
 
                   <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
@@ -202,7 +204,7 @@ export default async function HomePage() {
           </h2>
           <div className="space-y-8">
             <p className="text-2xl text-gray-700 font-medium leading-relaxed italic">
-              "No buscamos la perfección de las máquinas, sino la calidez de las manos. Cada punto cuenta una historia y cada nudo es un compromiso con la paciencia."
+              &quot;No buscamos la perfección de las máquinas, sino la calidez de las manos. Cada punto cuenta una historia y cada nudo es un compromiso con la paciencia.&quot;
             </p>
             <p className="text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto">
               En LocasPuntadas, no solo vendemos tejidos; compartimos un proceso artesanal honesto. Creemos en la sostenibilidad del tiempo y el respeto por el material.
@@ -221,6 +223,7 @@ export default async function HomePage() {
               src={RICKY_URL}
               alt="Ricky el ovillo"
               className="w-full h-full object-contain drop-shadow-2xl floating-doodle"
+              sizes="(max-width: 1024px) 256px, 288px"
             />
           </div>
 
@@ -258,3 +261,4 @@ export default async function HomePage() {
     </div>
   );
 }
+

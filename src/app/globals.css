@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-heading: var(--font-montserrat);
-  --font-script: var(--font-spicy-rice);
+  --font-heading: "Trebuchet MS", "Montserrat", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-script: "Brush Script MT", "Segoe Script", "Comic Sans MS", cursive;
 
   --color-rosa-pastel: #FDF2F8;
   --color-rosa-empolvado: #FCE7F3;

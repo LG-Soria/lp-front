@@ -28,6 +28,9 @@ export default function InfoPage() {
                             alt="Ricky el ovillo con zapatillas"
                             className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.15)] floating-doodle"
                             priority={true}
+                            width={320}
+                            height={320}
+                            sizes="(max-width: 1024px) 288px, 320px"
                         />
                         <StarDoodle className="absolute top-0 right-0 w-16 h-16 text-yellow-500 z-10" />
                     </div>
@@ -76,7 +79,7 @@ export default function InfoPage() {
                                 <h2 className="text-3xl font-heading font-black uppercase text-lila">Cuidado de Cristal</h2>
                                 <div className="bg-orange-50 p-6 rounded-3xl border-4 border-dashed border-orange-200">
                                     <p className="text-lg text-gray-700 font-medium leading-relaxed italic">
-                                        "Lavar a mano, agua fría, jabón neutro. Nada de secarropas, ¡por favor! Dejame secar estirado a la sombra como si estuviera tomando una siesta."
+                                        &quot;Lavar a mano, agua fría, jabón neutro. Nada de secarropas, ¡por favor! Dejame secar estirado a la sombra como si estuviera tomando una siesta.&quot;
                                     </p>
                                 </div>
                             </div>
@@ -110,3 +113,4 @@ export default function InfoPage() {
         </div>
     );
 }
+

@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ProductType } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { apiService } from '@/services/apiService';
 import Link from 'next/link';
 import { OptimizedImage } from '@/components/OptimizedImage';
+
+type ShippingQuote = Awaited<ReturnType<typeof apiService.getShippingQuotes>>['quotes'][number];
+type CheckoutOrder = Awaited<ReturnType<typeof apiService.createCheckout>>;
+
+const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    return 'Error inesperado';
+};
 
 export default function CheckoutPage() {
     const { cart: items, clearCart } = useCart();
@@ -33,8 +41,8 @@ export default function CheckoutPage() {
         postalCode: '',
     });
 
-    const [quotes, setQuotes] = useState<any[]>([]);
-    const [selectedQuote, setSelectedQuote] = useState<any>(null);
+    const [quotes, setQuotes] = useState<ShippingQuote[]>([]);
+    const [selectedQuote, setSelectedQuote] = useState<ShippingQuote | null>(null);
     const [loadingQuotes, setLoadingQuotes] = useState(false);
 
     const handleInfoSubmit = async (e: React.FormEvent) => {
@@ -76,7 +84,7 @@ export default function CheckoutPage() {
             if (response.quotes.length > 0) {
                 setSelectedQuote(response.quotes[0]);
             }
-        } catch (err: any) {
+        } catch {
             setError("No pudimos calcular el envío. Por favor revisá el código postal.");
         } finally {
             setLoadingQuotes(false);
@@ -102,7 +110,7 @@ export default function CheckoutPage() {
             }
             setSubmitted(true);
             clearCart();
-        } catch (err: any) {
+        } catch {
             setError("Ocurrió un error al procesar tu solicitud. Por favor contactanos por WhatsApp.");
         } finally {
             setSubmitting(false);
@@ -110,7 +118,7 @@ export default function CheckoutPage() {
     };
 
     const handleConfirmPurchase = async () => {
-        if (!selectedQuote && !hasPedido) {
+        if (!selectedQuote) {
             setError("Por favor seleccioná un método de envío.");
             return;
         }
@@ -118,6 +126,7 @@ export default function CheckoutPage() {
         setSubmitting(true);
         setError(null);
         try {
+            const selectedMode = selectedQuote.mode ?? 'BRANCH';
             // 1. Crear Orden
             const checkoutData = {
                 items: items.map(item => ({ productId: item.id, quantity: item.quantity })),
@@ -127,9 +136,9 @@ export default function CheckoutPage() {
                     phone: customer.phone
                 },
                 delivery: {
-                    mode: selectedQuote.mode,
+                    mode: selectedMode,
                     postalCode: address.postalCode,
-                    address: selectedQuote.mode === 'HOME' ? {
+                    address: selectedMode === 'HOME' ? {
                         line1: address.line1,
                         city: address.city,
                         province: address.province,
@@ -138,7 +147,7 @@ export default function CheckoutPage() {
                 }
             };
 
-            const order = await apiService.createCheckout(checkoutData);
+            const order: CheckoutOrder = await apiService.createCheckout(checkoutData);
 
             // 2. Crear Preferencia de Mercado Pago
             const { initPointUrl } = await apiService.createMPPreference(order.orderId);
@@ -149,8 +158,8 @@ export default function CheckoutPage() {
             // Nota: El carrito se limpia después de que el webhook confirme el pago, 
             // aunque aquí el usuario deja la página. 
             // En un flujo ideal, limpiaríamos si el pago es exitoso.
-        } catch (err: any) {
-            setError(err.message || "Error al procesar el pago. Intentá nuevamente.");
+        } catch (err: unknown) {
+            setError(getErrorMessage(err) || "Error al procesar el pago. Intentá nuevamente.");
             setSubmitting(false);
         }
     };
@@ -312,7 +321,7 @@ export default function CheckoutPage() {
                                                     </div>
                                                 </div>
                                                 <div className="text-lg font-bold text-coral">
-                                                    {quote.costCents === 0 ? '¡GRATIS!' : `$${(quote.costCents / 100).toLocaleString('es-AR')}`}
+                                                    {(quote.costCents ?? 0) === 0 ? '¡GRATIS!' : `$${((quote.costCents ?? 0) / 100).toLocaleString('es-AR')}`}
                                                 </div>
                                             </div>
                                         </label>
@@ -339,7 +348,15 @@ export default function CheckoutPage() {
                                 <div key={item.id} className="flex justify-between text-sm items-center">
                                     <div className="flex gap-3 items-center">
                                         <div className="w-10 h-10 bg-gray-50 rounded overflow-hidden">
-                                            {item.imagenes?.[0] && <OptimizedImage src={item.imagenes[0]} alt={item.nombre} className="w-full h-full object-cover" />}
+                                            {item.imagenes?.[0] && (
+                                                <OptimizedImage
+                                                    src={item.imagenes[0]}
+                                                    alt={item.nombre}
+                                                    className="w-full h-full object-cover"
+                                                    width={40}
+                                                    height={40}
+                                                />
+                                            )}
                                         </div>
                                         <span className="text-gray-600 font-medium">{item.quantity}x {item.nombre}</span>
                                     </div>
@@ -356,12 +373,12 @@ export default function CheckoutPage() {
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500 font-medium">Envío</span>
                                 <span className={`font-bold ${selectedQuote ? 'text-coral' : 'text-gray-400 italic'}`}>
-                                    {selectedQuote ? (selectedQuote.costCents === 0 ? 'Gratis' : `$${(selectedQuote.costCents / 100).toLocaleString('es-AR')}`) : 'Calculando...'}
+                                    {selectedQuote ? ((selectedQuote.costCents ?? 0) === 0 ? 'Gratis' : `$${((selectedQuote.costCents ?? 0) / 100).toLocaleString('es-AR')}`) : 'Calculando...'}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center pt-4 border-t border-dashed border-gray-100">
                                 <span className="text-xl font-heading font-bold text-gray-800">Total</span>
-                                <span className="text-3xl font-bold text-coral">${(subtotal + (selectedQuote ? selectedQuote.costCents / 100 : 0)).toLocaleString('es-AR')}</span>
+                                <span className="text-3xl font-bold text-coral">${(subtotal + ((selectedQuote?.costCents ?? 0) / 100)).toLocaleString('es-AR')}</span>
                             </div>
                         </div>
 
@@ -391,3 +408,5 @@ export default function CheckoutPage() {
         </div>
     );
 }
+
+

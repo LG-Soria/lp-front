@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { OptimizedImage } from './OptimizedImage';
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -9,24 +10,12 @@ interface MobileMenuProps {
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
-    const [isRendered, setIsRendered] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-
     useEffect(() => {
-        if (isOpen) {
-            setIsRendered(true);
-            const timer = setTimeout(() => setIsVisible(true), 10);
-            document.body.style.overflow = 'hidden';
-            return () => clearTimeout(timer);
-        } else {
-            setIsVisible(false);
-            const timer = setTimeout(() => setIsRendered(false), 300);
+        document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+        return () => {
             document.body.style.overflow = 'unset';
-            return () => clearTimeout(timer);
-        }
+        };
     }, [isOpen]);
-
-    if (!isRendered) return null;
 
     const links = [
         { name: 'Home', href: '/' },
@@ -36,23 +25,25 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
     ];
 
     return (
-        <div className={`fixed inset-0 z-100 transition-visibility ${isVisible ? 'visible' : 'invisible delay-300'}`}>
+        <div className={`fixed inset-0 z-100 transition-visibility ${isOpen ? 'visible' : 'invisible delay-300'}`}>
             {/* Backdrop */}
             <div
-                className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
                 onClick={onClose}
             />
 
             {/* Drawer Panel */}
             <div
-                className={`absolute top-0 left-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col ${isVisible ? 'translate-x-0' : '-translate-x-full'}`}
+                className={`absolute top-0 left-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="flex flex-col h-full overflow-y-auto bg-white">
                     <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-white">
-                        <img
+                        <OptimizedImage
                             src="/logo.png"
                             alt="Locas Puntadas"
                             className="h-8 w-auto object-contain"
+                            width={160}
+                            height={32}
                         />
                         <button
                             onClick={onClose}

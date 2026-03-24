@@ -12,31 +12,16 @@ interface SearchDrawerProps {
 }
 
 const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
-    const [isRendered, setIsRendered] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Product[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        if (isOpen) {
-            setIsRendered(true);
-            // Small delay to trigger transition after mounting
-            const timer = setTimeout(() => setIsVisible(true), 10);
-            document.body.style.overflow = 'hidden';
-            return () => clearTimeout(timer);
-        } else {
-            setIsVisible(false);
-            const timer = setTimeout(() => {
-                setIsRendered(false);
-                // Reset search state when closing
-                setSearchQuery('');
-                setSearchResults([]);
-            }, 300);
+        document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+        return () => {
             document.body.style.overflow = 'unset';
-            return () => clearTimeout(timer);
-        }
+        };
     }, [isOpen]);
 
     // Debounce search
@@ -63,24 +48,30 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
         return () => clearTimeout(debounceTimer);
     }, [searchQuery]);
 
+    useEffect(() => {
+        if (!isOpen) {
+            setSearchQuery('');
+            setSearchResults([]);
+            setIsSearching(false);
+        }
+    }, [isOpen]);
+
     const handleProductClick = (productId: string) => {
         router.push(`/producto/${productId}`);
         onClose();
     };
 
-    if (!isRendered) return null;
-
     return (
-        <div className={`fixed inset-0 z-100 transition-visibility ${isVisible ? 'visible' : 'invisible delay-300'}`}>
+        <div className={`fixed inset-0 z-100 transition-visibility ${isOpen ? 'visible' : 'invisible delay-300'}`}>
             {/* Backdrop */}
             <div
-                className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
                 onClick={onClose}
             />
 
             {/* Drawer Panel */}
             <div
-                className={`absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col ${isVisible ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 <div className="flex flex-col h-full bg-white">
                     {/* Header */}
@@ -102,6 +93,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                                 alt="Locas Puntadas"
                                 className="h-16 w-auto object-contain mb-3"
                                 priority={true}
+                                width={200}
+                                height={64}
                             />
                             <h2 className="text-2xl font-serif italic text-gray-800 mb-6">Búsqueda</h2>
 
@@ -161,6 +154,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                                                     src={product.imagenes[0]}
                                                     alt={product.nombre}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    width={80}
+                                                    height={80}
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-300">

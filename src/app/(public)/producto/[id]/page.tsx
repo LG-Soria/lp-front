@@ -1,9 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { apiService } from '@/services/apiService';
-import { Product, ProductType } from '@/types';
+import { ProductType } from '@/types';
 import { SmileyFlowerDoodle, StarDoodle, WavyLine } from '@/components/doodles';
-import dynamic from 'next/dynamic';
 import { PersonalizableBanner } from '@/components/PersonalizableBanner';
 import { ProductImageGallery } from '@/components/ProductDetail/ProductImageGallery';
 import { ProductActions } from '@/components/ProductDetail/ProductActions';

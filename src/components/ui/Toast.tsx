@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SmileyFlowerDoodle } from '@/components/doodles';
 
 interface ToastProps {
@@ -14,18 +14,18 @@ export default function Toast({ message, type = 'error', duration = 5000, onClos
     const [isExiting, setIsExiting] = useState(false);
     const [copying, setCopying] = useState(false);
 
+    const handleClose = useCallback(() => {
+        setIsExiting(true);
+        setTimeout(onClose, 300);
+    }, [onClose]);
+
     useEffect(() => {
         const timer = setTimeout(() => {
             handleClose();
         }, duration);
 
         return () => clearTimeout(timer);
-    }, [duration]);
-
-    const handleClose = () => {
-        setIsExiting(true);
-        setTimeout(onClose, 300);
-    };
+    }, [duration, handleClose]);
 
     const handleCopy = async () => {
         try {

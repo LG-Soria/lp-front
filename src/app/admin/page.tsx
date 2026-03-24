@@ -1,12 +1,9 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
 
 export default function AdminDashboardPage() {
-    const { user, logout } = useAuth();
-
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 md:p-12 lg:p-16 relative overflow-hidden">
             {/* Background Doodles */}

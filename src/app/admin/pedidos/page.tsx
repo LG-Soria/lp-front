@@ -5,12 +5,64 @@ import { apiService } from '@/services/apiService';
 import { AdminHeader } from '@/components/AdminHeader';
 import { OrderStatus } from '@/types';
 
+interface AdminOrderListItem {
+    id: string;
+    createdAt: string;
+    customerName?: string | null;
+    customerEmail?: string | null;
+    totalCents: number;
+    status: OrderStatus;
+}
+
+interface AdminOrderItem {
+    id: string;
+    nameSnapshot: string;
+    quantity: number;
+    unitPriceCents: number;
+}
+
+interface AdminPayment {
+    id: string;
+    provider: string;
+    mpPaymentId?: string | null;
+    amountCents: number;
+    status: string;
+}
+
+interface AdminShipment {
+    mode?: string | null;
+    trackingCode?: string | null;
+    trackingUrl?: string | null;
+}
+
+interface AdminAddress {
+    line1?: string | null;
+    city?: string | null;
+    province?: string | null;
+    postalCode?: string | null;
+}
+
+interface AdminOrderDetail extends AdminOrderListItem {
+    customerPhone?: string | null;
+    subtotalCents: number;
+    shippingCents: number;
+    items?: AdminOrderItem[];
+    payments?: AdminPayment[];
+    shipment?: AdminShipment | null;
+    address?: AdminAddress | null;
+}
+
+const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    return 'Error inesperado';
+};
+
 export default function AdminOrdersPage() {
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<AdminOrderListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<AdminOrderDetail | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
@@ -21,10 +73,10 @@ export default function AdminOrdersPage() {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const response = await apiService.getAdminOrders();
+            const response = await apiService.getAdminOrders() as { data?: AdminOrderListItem[] };
             setOrders(response.data || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -33,10 +85,10 @@ export default function AdminOrdersPage() {
     const handleViewDetail = async (id: string) => {
         try {
             setDetailLoading(true);
-            const order = await apiService.getAdminOrderById(id);
+            const order = await apiService.getAdminOrderById(id) as AdminOrderDetail;
             setSelectedOrder(order);
-        } catch (err: any) {
-            alert("Error al cargar detalles: " + err.message);
+        } catch (err: unknown) {
+            alert("Error al cargar detalles: " + getErrorMessage(err));
         } finally {
             setDetailLoading(false);
         }
@@ -49,8 +101,8 @@ export default function AdminOrdersPage() {
             await apiService.updateAdminOrderStatus(selectedOrder.id, newStatus);
             setSelectedOrder({ ...selectedOrder, status: newStatus });
             fetchOrders(); // Recargar lista
-        } catch (err: any) {
-            alert("Error al actualizar estado: " + err.message);
+        } catch (err: unknown) {
+            alert("Error al actualizar estado: " + getErrorMessage(err));
         } finally {
             setUpdatingStatus(false);
         }
@@ -235,7 +287,7 @@ export default function AdminOrdersPage() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
-                                                    {selectedOrder.items?.map((item: any) => (
+                                                    {selectedOrder.items?.map((item: AdminOrderItem) => (
                                                         <tr key={item.id}>
                                                             <td className="px-4 py-3 font-bold text-gray-900">{item.nameSnapshot}</td>
                                                             <td className="px-4 py-3 text-center">{item.quantity}</td>
@@ -266,7 +318,7 @@ export default function AdminOrdersPage() {
                                         <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Pagos</h3>
                                         {selectedOrder.payments && selectedOrder.payments.length > 0 ? (
                                             <div className="space-y-4">
-                                                {selectedOrder.payments.map((p: any) => (
+                                                {selectedOrder.payments.map((p: AdminPayment) => (
                                                     <div key={p.id} className="flex justify-between items-center text-sm bg-white p-3 rounded-xl border border-gray-100">
                                                         <div>
                                                             <p className="font-bold text-gray-800 uppercase text-[10px]">{p.provider.replace('_', ' ')}</p>

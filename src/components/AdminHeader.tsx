@@ -29,6 +29,8 @@ export const AdminHeader: React.FC = () => {
                             alt="Locas Puntadas Logo"
                             className="h-10 w-auto object-contain"
                             priority={true}
+                            width={200}
+                            height={50}
                         />
                         <span className="bg-coral/10 text-coral text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest mt-1">Admin</span>
                     </Link>

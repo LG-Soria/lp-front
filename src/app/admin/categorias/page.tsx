@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { apiService } from '@/services/apiService';
 import { Category } from '@/types';
 import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 export default function AdminCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -46,7 +47,7 @@ export default function AdminCategoriesPage() {
             const created = await apiService.createCategory({ nombre: newCategoryName });
             setCategories([...categories, { ...created, _count: { products: 0 } }]);
             setNewCategoryName('');
-        } catch (error) {
+        } catch {
             alert('Error al crear la categoría. Probablemente ya existe.');
         } finally {
             setIsSubmitting(false);
@@ -72,7 +73,7 @@ export default function AdminCategoriesPage() {
             const updated = await apiService.updateCategory(editingCategory.id, editForm);
             setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, ...updated } : c));
             setIsEditModalOpen(false);
-        } catch (error) {
+        } catch {
             alert('Error al actualizar la categoría');
         } finally {
             setIsSubmitting(false);
@@ -88,7 +89,7 @@ export default function AdminCategoriesPage() {
             const { uploadUrl, publicUrl } = await apiService.getPresignedUrl(file.name, file.type);
             await apiService.uploadFileToR2(uploadUrl, file);
             setEditForm({ ...editForm, imageUrl: publicUrl });
-        } catch (error) {
+        } catch {
             alert('Error al subir la imagen');
         } finally {
             setIsUploading(false);
@@ -106,7 +107,7 @@ export default function AdminCategoriesPage() {
         try {
             await apiService.deleteCategory(id);
             setCategories(categories.filter(c => c.id !== id));
-        } catch (error) {
+        } catch {
             alert('Error al eliminar la categoría');
         }
     };
@@ -263,7 +264,13 @@ export default function AdminCategoriesPage() {
                                             <div className="relative group aspect-4/5 rounded-[32px] overflow-hidden bg-gray-50 border-4 border-white shadow-md">
                                                 {editForm.imageUrl ? (
                                                     <>
-                                                        <img src={editForm.imageUrl} alt="Preview" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                        <OptimizedImage
+                                                            src={editForm.imageUrl}
+                                                            alt="Preview"
+                                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                            width={500}
+                                                            height={625}
+                                                        />
                                                         <div className="absolute inset-0 bg-coral/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                             <label className="bg-white text-coral px-4 py-2 rounded-full text-xs font-bold cursor-pointer hover:scale-105 transition-transform shadow-lg">
                                                                 Cambiar Imagen
@@ -314,3 +321,5 @@ export default function AdminCategoriesPage() {
         </div>
     );
 }
+
+

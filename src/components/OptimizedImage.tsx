@@ -16,8 +16,8 @@ interface OptimizedImageProps {
 }
 
 /**
- * Componente optimizado para imágenes con lazy loading
- * Usa Next.js Image cuando es posible, o img nativo con loading="lazy"
+ * Componente de imagen optimizada.
+ * Usa `next/image` para locales y externas configuradas en `next.config.ts`.
  */
 const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
     src,
@@ -31,31 +31,24 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
     objectFit = 'cover',
 }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const isRawImageSource = src.startsWith('data:') || src.startsWith('blob:');
+    const resolvedSizes = sizes || (fill ? '100vw' : undefined);
 
-    // Si la imagen es externa o no está optimizada por Cloudflare/CDN, usar img nativo
-    const isExternalImage = src.startsWith('http://') || src.startsWith('https://');
-
-    if (isExternalImage) {
+    if (isRawImageSource) {
         return (
-            <div className="relative">
-                {isLoading && (
-                    <div className="absolute inset-0 bg-gray-100 animate-pulse rounded" />
-                )}
-                <img
-                    src={src}
-                    alt={alt}
-                    className={className}
-                    width={width}
-                    height={height}
-                    loading={priority ? 'eager' : 'lazy'}
-                    onLoad={() => setIsLoading(false)}
-                    style={{ objectFit }}
-                />
-            </div>
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+                src={src}
+                alt={alt}
+                className={className}
+                width={width}
+                height={height}
+                loading={priority ? 'eager' : 'lazy'}
+                style={{ objectFit }}
+            />
         );
     }
 
-    // Para imágenes locales, usar Next.js Image para optimización automática
     return (
         <div className="relative">
             {isLoading && !priority && (
@@ -67,9 +60,9 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                 className={className}
                 priority={priority}
                 fill={fill}
-                width={!fill ? width : undefined}
-                height={!fill ? height : undefined}
-                sizes={sizes}
+                width={!fill ? (width ?? 1200) : undefined}
+                height={!fill ? (height ?? 1200) : undefined}
+                sizes={resolvedSizes}
                 onLoad={() => setIsLoading(false)}
                 style={{ objectFit }}
             />

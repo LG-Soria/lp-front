@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '@/services/apiService';
 import { Product, Category, ProductType } from '@/types';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
 import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
 import dynamic from 'next/dynamic';
 import DataTable, { Column } from '@/components/admin/DataTable';
@@ -13,16 +12,14 @@ const ProductModal = dynamic(() => import('@/components/admin/ProductModal'), { 
 import { useDebounce } from '@/hooks/useDebounce';
 import { OptimizedImage } from '@/components/OptimizedImage';
 
-const PRODUCT_LABELS = [
-    { value: '', label: 'Sin etiqueta' },
-    { value: 'Novedades', label: 'Novedades' },
-    { value: 'Best Seller', label: 'Best Seller' },
-    { value: 'Locamente Favoritos', label: 'Locamente Favoritos' },
-];
-
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
-    const [meta, setMeta] = useState<any>(null);
+    const [meta, setMeta] = useState<{
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    } | undefined>(undefined);
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,17 +30,12 @@ export default function AdminProductsPage() {
     const [sortBy, setSortBy] = useState('nombre');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-    const { token } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     useEffect(() => {
         loadCategories();
     }, []);
-
-    useEffect(() => {
-        loadProducts();
-    }, [debouncedSearch, selectedCategory, selectedType, page, sortBy, sortOrder]);
 
     const loadCategories = async () => {
         try {
@@ -54,7 +46,7 @@ export default function AdminProductsPage() {
         }
     };
 
-    const loadProducts = async () => {
+    const loadProducts = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await apiService.getProducts({
@@ -73,7 +65,11 @@ export default function AdminProductsPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [page, debouncedSearch, selectedCategory, selectedType, sortBy, sortOrder, categories]);
+
+    useEffect(() => {
+        loadProducts();
+    }, [loadProducts]);
 
     const handleDelete = async (id: string) => {
         if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
@@ -81,7 +77,7 @@ export default function AdminProductsPage() {
         try {
             await apiService.deleteProduct(id);
             setProducts(products.filter(p => p.id !== id));
-        } catch (error) {
+        } catch {
             alert('Error al eliminar el producto');
         }
     };

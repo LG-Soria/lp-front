@@ -3,7 +3,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Category, ProductType } from '@/types';
-import { TapeDoodle, StarDoodle } from '@/components/doodles';
+import { TapeDoodle } from '@/components/doodles';
 
 interface CategoryFiltersProps {
     categories: Category[];

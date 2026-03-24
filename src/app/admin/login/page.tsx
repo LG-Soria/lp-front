@@ -3,6 +3,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
+const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    return 'Error al iniciar sesion';
+};
+
 export default function AdminLoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,8 +34,8 @@ export default function AdminLoginPage() {
             }
 
             login(data.access_token, data.user);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err));
         } finally {
             setIsLoading(false);
         }

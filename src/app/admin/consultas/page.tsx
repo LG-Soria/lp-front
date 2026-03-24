@@ -4,13 +4,39 @@ import React, { useEffect, useState } from 'react';
 import { apiService } from '@/services/apiService';
 import { AdminHeader } from '@/components/AdminHeader';
 import { RequestStatus } from '@/types';
+import { OptimizedImage } from '@/components/OptimizedImage';
+
+interface AdminRequestListItem {
+    id: string;
+    createdAt: string;
+    customerName: string;
+    email?: string | null;
+    phone?: string | null;
+    productName: string;
+    status: RequestStatus;
+}
+
+interface AdminRequestDetail extends AdminRequestListItem {
+    postalCode?: string | null;
+    description?: string | null;
+    product?: {
+        nombre: string;
+        precio?: number | null;
+        imagenes: string[];
+    } | null;
+}
+
+const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    return 'Error inesperado';
+};
 
 export default function AdminRequestsPage() {
-    const [requests, setRequests] = useState<any[]>([]);
+    const [requests, setRequests] = useState<AdminRequestListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+    const [selectedRequest, setSelectedRequest] = useState<AdminRequestDetail | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
@@ -21,10 +47,10 @@ export default function AdminRequestsPage() {
     const fetchRequests = async () => {
         try {
             setLoading(true);
-            const response = await apiService.getAdminRequests();
+            const response = await apiService.getAdminRequests() as { data?: AdminRequestListItem[] };
             setRequests(response.data || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -33,10 +59,10 @@ export default function AdminRequestsPage() {
     const handleViewDetail = async (id: string) => {
         try {
             setDetailLoading(true);
-            const request = await apiService.getAdminRequestById(id);
+            const request = await apiService.getAdminRequestById(id) as AdminRequestDetail;
             setSelectedRequest(request);
-        } catch (err: any) {
-            alert("Error al cargar detalles: " + err.message);
+        } catch (err: unknown) {
+            alert("Error al cargar detalles: " + getErrorMessage(err));
         } finally {
             setDetailLoading(false);
         }
@@ -50,8 +76,8 @@ export default function AdminRequestsPage() {
             // Actualizar localmente o recargar
             setSelectedRequest({ ...selectedRequest, status: newStatus });
             fetchRequests(); // Recargar lista
-        } catch (err: any) {
-            alert("Error al actualizar estado: " + err.message);
+        } catch (err: unknown) {
+            alert("Error al actualizar estado: " + getErrorMessage(err));
         } finally {
             setUpdatingStatus(false);
         }
@@ -193,7 +219,13 @@ export default function AdminRequestsPage() {
                                     <div className="flex gap-4 items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                         <div className="w-16 h-16 rounded-xl overflow-hidden bg-white shrink-0">
                                             {selectedRequest.product?.imagenes[0] && (
-                                                <img src={selectedRequest.product.imagenes[0]} alt={selectedRequest.product.nombre} className="w-full h-full object-cover" />
+                                                <OptimizedImage
+                                                    src={selectedRequest.product.imagenes[0]}
+                                                    alt={selectedRequest.product.nombre}
+                                                    className="w-full h-full object-cover"
+                                                    width={64}
+                                                    height={64}
+                                                />
                                             )}
                                         </div>
                                         <div>
@@ -205,7 +237,7 @@ export default function AdminRequestsPage() {
                                     <div className="mt-6">
                                         <p className="text-[10px] text-gray-400 uppercase font-black tracking-tight mb-2">Mensaje / Descripción</p>
                                         <div className="p-4 bg-lila-suave/30 rounded-xl text-sm italic text-gray-600 leading-relaxed min-h-[80px]">
-                                            "{selectedRequest.description || 'Sin comentarios adicionales.'}"
+                                            &quot;{selectedRequest.description || 'Sin comentarios adicionales.'}&quot;
                                         </div>
                                     </div>
                                 </section>

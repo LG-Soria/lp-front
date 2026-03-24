@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { apiService } from '@/services/apiService';
-import { Category, ProductType } from '@/types';
-import { StarDoodle, SmileyFlowerDoodle, TapeDoodle } from '@/components/doodles';
+import { Category, Product, ProductType } from '@/types';
+import { StarDoodle, SmileyFlowerDoodle } from '@/components/doodles';
 import Toast from '@/components/ui/Toast';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 export default function ProductFormPage() {
     const router = useRouter();
@@ -33,26 +34,24 @@ export default function ProductFormPage() {
     const [isFetching, setIsFetching] = useState(isEditing);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        loadCategories();
-        if (isEditing) {
-            loadProduct();
-        }
-    }, []);
+    const getErrorMessage = (errorValue: unknown): string => {
+        if (errorValue instanceof Error) return errorValue.message;
+        return 'Error inesperado';
+    };
 
-    const loadCategories = async () => {
+    const loadCategories = useCallback(async () => {
         try {
             const data = await apiService.getCategories();
             setCategories(data);
-            if (data.length > 0 && !formData.categoryId) {
-                setFormData(prev => ({ ...prev, categoryId: data[0].id }));
+            if (data.length > 0) {
+                setFormData(prev => (prev.categoryId ? prev : { ...prev, categoryId: data[0].id }));
             }
         } catch (error) {
             console.error('Error loading categories:', error);
         }
-    };
+    }, []);
 
-    const loadProduct = async () => {
+    const loadProduct = useCallback(async () => {
         try {
             const product = await apiService.getProductById(params.id as string);
             if (product) {
@@ -78,7 +77,16 @@ export default function ProductFormPage() {
         } finally {
             setIsFetching(false);
         }
-    };
+    }, [params.id]);
+
+    useEffect(() => {
+        loadCategories();
+        if (isEditing) {
+            loadProduct();
+        } else {
+            setIsFetching(false);
+        }
+    }, [isEditing, loadCategories, loadProduct]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,11 +94,15 @@ export default function ProductFormPage() {
         setError(null);
 
         // Clean payload: Remove read-only or extra fields
-        const { displayPrecio, id, precioCents, currency, createdAt, updatedAt, category, ...cleanData } = formData as any;
-
-        const payload = {
-            ...cleanData,
+        const payload: Partial<Product> = {
+            nombre: formData.nombre,
+            descripcion: formData.descripcion || null,
             precio: formData.precio ? parseFloat(formData.precio) : null,
+            tipo: formData.tipo,
+            label: formData.label || null,
+            categoryId: formData.categoryId,
+            tiempoProduccion: formData.tiempoProduccion || null,
+            personalizable: formData.personalizable,
             imagenes: formData.imagenes.filter(img => img.trim() !== ''),
             weightGrams: formData.weightGrams ? parseInt(formData.weightGrams) : null,
             lengthCm: formData.lengthCm ? parseInt(formData.lengthCm) : null,
@@ -102,13 +114,13 @@ export default function ProductFormPage() {
 
         try {
             if (isEditing) {
-                await apiService.updateProduct(params.id as string, payload as any);
+                await apiService.updateProduct(params.id as string, payload);
             } else {
-                await apiService.createProduct(payload as any);
+                await apiService.createProduct(payload);
             }
             router.push('/admin/productos');
-        } catch (error: any) {
-            setError(error.message || 'Error al guardar el producto');
+        } catch (error: unknown) {
+            setError(getErrorMessage(error) || 'Error al guardar el producto');
         } finally {
             setIsLoading(false);
         }
@@ -329,7 +341,13 @@ export default function ProductFormPage() {
                             {formData.imagenes.map((img, index) => (
                                 img && (
                                     <div key={index} className="relative aspect-square rounded-[32px] overflow-hidden group shadow-md border-4 border-white">
-                                        <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        <OptimizedImage
+                                            src={img}
+                                            alt={`Preview ${index}`}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            width={400}
+                                            height={400}
+                                        />
                                         <div className="absolute inset-0 bg-coral/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         <button
                                             type="button"
@@ -372,7 +390,7 @@ export default function ProductFormPage() {
                                                     imagenes: [...currentImages, ...newPublicUrls]
                                                 }));
                                             }
-                                        } catch (err) {
+                                        } catch {
                                             alert('Error al subir las imágenes');
                                         } finally {
                                             setIsLoading(false);
@@ -407,3 +425,4 @@ export default function ProductFormPage() {
         </div>
     );
 }
+

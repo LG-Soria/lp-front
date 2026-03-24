@@ -1,0 +1,68 @@
+﻿[
+    {
+        "preset":  "desktop",
+        "path":  "/",
+        "runs":  3,
+        "performance":  100,
+        "fcpMs":  246.7,
+        "lcpMs":  652.7,
+        "siMs":  296.2,
+        "tbtMs":  0,
+        "cls":  0
+    },
+    {
+        "preset":  "desktop",
+        "path":  "/checkout",
+        "runs":  3,
+        "performance":  100,
+        "fcpMs":  205.8,
+        "lcpMs":  589.9,
+        "siMs":  206.1,
+        "tbtMs":  0,
+        "cls":  0
+    },
+    {
+        "preset":  "desktop",
+        "path":  "/producto/test",
+        "runs":  3,
+        "performance":  100,
+        "fcpMs":  206.4,
+        "lcpMs":  602.9,
+        "siMs":  334.3,
+        "tbtMs":  0,
+        "cls":  0
+    },
+    {
+        "preset":  "mobile",
+        "path":  "/",
+        "runs":  3,
+        "performance":  98,
+        "fcpMs":  1781.9,
+        "lcpMs":  1781.9,
+        "siMs":  3037,
+        "tbtMs":  58.6,
+        "cls":  0
+    },
+    {
+        "preset":  "mobile",
+        "path":  "/checkout",
+        "runs":  3,
+        "performance":  99,
+        "fcpMs":  1693.4,
+        "lcpMs":  1693.4,
+        "siMs":  1901.7,
+        "tbtMs":  40.4,
+        "cls":  0
+    },
+    {
+        "preset":  "mobile",
+        "path":  "/producto/test",
+        "runs":  3,
+        "performance":  97.3,
+        "fcpMs":  1717.2,
+        "lcpMs":  1717.2,
+        "siMs":  3811.3,
+        "tbtMs":  40.2,
+        "cls":  0
+    }
+]
