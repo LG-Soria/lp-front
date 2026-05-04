@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.soriavps.cloud",
       },
+      {
+        protocol: "https",
+        hostname: "pub-089bceecfe7a4a70974b085d5ee0f0d2.r2.dev",
+      },
     ],
   },
 };
