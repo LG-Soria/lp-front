@@ -8,7 +8,7 @@ import { ClientWavyBackground } from '@/components/background/ClientWavyBackgrou
 import { FavoriteProductCard } from '@/components/FavoriteProductCard';
 
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
-const FAVORITES_LABEL = 'Locamente Favoritos';
+
 
 export default async function HomePage() {
   const config = await apiService.getHomeConfig();
@@ -18,15 +18,12 @@ export default async function HomePage() {
     ? await apiService.getEligibleFeaturedProducts({ limit: 3, ids: featuredProductIds, imageMode: 'cover' })
     : await apiService.getEligibleFeaturedProducts({ imageMode: 'cover' });
 
-  // Determinar los productos favoritos manteniendo el orden configurado.
-  const featuredCandidates = featuredProductIds.length === 0
+  // Determinar los productos destacados manteniendo el orden configurado.
+  const featured = featuredProductIds.length === 0
     ? configuredFeatured
     : featuredProductIds
       .map((id: string) => configuredFeatured.find(p => p.id === id))
       .filter((p: Product | undefined): p is Product => !!p);
-  const featured = featuredCandidates
-    .filter((product: Product) => product.label === FAVORITES_LABEL)
-    .slice(0, 3);
 
 
   return (
