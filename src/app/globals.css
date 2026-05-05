@@ -144,3 +144,68 @@
 .selection\:text-rosa-accent::selection {
   color: #dc1537;
 }
+
+/* Contact Page Animations */
+.animate-fade-up {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.65s ease forwards;
+}
+
+.animate-pop {
+  opacity: 0;
+  transform: scale(0.96);
+  animation: popIn 0.5s ease forwards;
+}
+
+.animate-float {
+  animation: floatSoft 4.5s ease-in-out infinite;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatSoft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.contact-card,
+.contact-button {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-4px);
+}
+
+.contact-button:hover {
+  transform: translateY(-2px);
+}
+
+.contact-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -18,12 +18,38 @@ export default async function HomePage() {
     ? await apiService.getEligibleFeaturedProducts({ limit: 3, ids: featuredProductIds, imageMode: 'cover' })
     : await apiService.getEligibleFeaturedProducts({ imageMode: 'cover' });
 
-  // Determinar los productos destacados manteniendo el orden configurado.
-  const featured = featuredProductIds.length === 0
+  // Lógica de selección de productos: priorizar variedad de tipos (categoría, label o tipo básico)
+  const getProductType = (p: Product) => p.label || p.category?.nombre || p.tipo;
+  
+  const candidates = featuredProductIds.length === 0
     ? configuredFeatured
     : featuredProductIds
       .map((id: string) => configuredFeatured.find(p => p.id === id))
       .filter((p: Product | undefined): p is Product => !!p);
+
+  const selectedProducts: Product[] = [];
+  const usedTypes = new Set<string>();
+  const MAX_FEATURED = 3;
+
+  // Primera pasada: intentar obtener uno de cada tipo distinto
+  for (const p of candidates) {
+    if (selectedProducts.length >= MAX_FEATURED) break;
+    const type = getProductType(p);
+    if (!usedTypes.has(type)) {
+      selectedProducts.push(p);
+      usedTypes.add(type);
+    }
+  }
+
+  // Segunda pasada: rellenar con los que faltan respetando el orden original si no se cubrió el cupo
+  for (const p of candidates) {
+    if (selectedProducts.length >= MAX_FEATURED) break;
+    if (!selectedProducts.find(s => s.id === p.id)) {
+      selectedProducts.push(p);
+    }
+  }
+
+  const featured = selectedProducts;
 
 
   return (

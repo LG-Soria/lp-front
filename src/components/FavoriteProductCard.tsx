@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Product, ProductType } from '@/types';
 import { OptimizedImage } from './OptimizedImage';
-import { HeartDoodle, StarDoodle, TapeDoodle } from './doodles';
+import { HeartDoodle, StarDoodle, TapeDoodle, SmileyFlowerDoodle, GlassesDoodle } from './doodles';
 
 interface FavoriteProductCardProps {
   product: Product;
@@ -48,7 +48,28 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
   const whatsappPhone = process.env.NEXT_PUBLIC_WA_PHONE || '5491112345678';
   const whatsappHref = `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hola! Queria consultar por ${product.nombre}.`)}`;
   const categoryColor = product.category?.color || '#dc1537';
+  
+  const typeString = product.label || product.category?.nombre || product.tipo || 'default';
+  const hash = typeString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const tapeColors = ['#dc1537', '#e9bbff', '#fca5a5', '#f4a261', '#4ade80', '#60a5fa'];
+  const tapeColor = product.category?.color || tapeColors[hash % tapeColors.length];
+  
   const description = product.descripcion?.trim();
+
+  // Doodles decorativos alternos
+  const renderDecorativeDoodle = () => {
+    switch (index % 4) {
+      case 0:
+        return <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-rosa-empolvado opacity-80 transition-transform duration-500 group-hover:rotate-12" />;
+      case 1:
+        return <HeartDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-coral/40 opacity-80 transition-transform duration-500 group-hover:-rotate-12" />;
+      case 2:
+        return <SmileyFlowerDoodle className="absolute -right-5 bottom-0 z-20 h-14 w-14 text-lila-suave opacity-80 transition-transform duration-500 group-hover:rotate-45" />;
+      case 3:
+      default:
+        return <GlassesDoodle className="absolute -right-2 bottom-4 z-20 h-8 w-16 text-gray-200 opacity-80 transition-transform duration-500 group-hover:-rotate-6" />;
+    }
+  };
 
   return (
     <article className="group relative flex h-full flex-col lg:flex-row lg:items-center rounded-[40px] border border-white/80 bg-white/95 p-5 shadow-[0_24px_70px_-32px_rgba(220,21,55,0.45)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_32px_90px_-36px_rgba(220,21,55,0.55)] sm:p-8 lg:p-10 lg:gap-12">
@@ -71,10 +92,10 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
         </div>
 
         <TapeDoodle
-          color={categoryColor}
+          color={tapeColor}
           className="absolute -top-3 left-7 z-20 w-16 -rotate-6 opacity-80 transition-transform duration-500 group-hover:-rotate-2"
         />
-        <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-rosa-empolvado opacity-80 transition-transform duration-500 group-hover:rotate-12" />
+        {renderDecorativeDoodle()}
       </div>
 
       <div className="flex grow flex-col justify-center">
@@ -105,7 +126,7 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
         </h3>
 
         {description && (
-          <p className="mb-5 line-clamp-3 text-sm font-medium leading-relaxed text-gray-500">
+          <p className="mb-6 line-clamp-2 md:line-clamp-3 text-sm md:text-base font-medium leading-relaxed text-gray-600">
             {description}
           </p>
         )}
