@@ -60,23 +60,23 @@ export default function ContactPage() {
                             <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
                                 
                                 {/* Comic Balloon */}
-                                <div className="relative bg-white border-[4px] border-[#111111] rounded-[28px] p-5 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] 
-                                                w-[240px] md:w-[260px] lg:w-[280px] flex-shrink-0 animate-pop" style={{ animationDelay: '250ms' }}>
+                                <div className="relative bg-white border-4 border-[#111111] rounded-[28px] p-5 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] 
+                                                w-[240px] md:w-[260px] lg:w-[280px] shrink-0 animate-pop" style={{ animationDelay: '250ms' }}>
                                     <p className="text-[#12192C] font-medium text-sm md:text-base leading-snug">
                                         <span className="text-[#E4072F] font-bold">¡Hola!</span> Estoy acá para ayudarte con pedidos, consultas y personalizados.
                                     </p>
                                     
                                     {/* Tail Mobile & Tablet (down) */}
-                                    <div className="absolute -bottom-[12px] left-1/2 -translate-x-1/2 lg:hidden w-6 h-6 border-b-[4px] border-r-[4px] border-[#111111] transform rotate-45 z-[-1]"></div>
+                                    <div className="absolute -bottom-[12px] left-1/2 -translate-x-1/2 lg:hidden w-6 h-6 border-b-4 border-r-4 border-[#111111] transform rotate-45 z-[-1]"></div>
                                     <div className="absolute -bottom-[4px] left-1/2 -translate-x-1/2 lg:hidden w-6 h-6 bg-white transform rotate-45"></div>
 
                                     {/* Tail Desktop (right) */}
-                                    <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -right-[12px] w-6 h-6 border-t-[4px] border-r-[4px] border-[#111111] transform rotate-45 z-[-1]"></div>
+                                    <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -right-[12px] w-6 h-6 border-t-4 border-r-4 border-[#111111] transform rotate-45 z-[-1]"></div>
                                     <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -right-[4px] w-6 h-6 bg-white transform rotate-45"></div>
                                 </div>
 
                                 {/* Ricky Image */}
-                                <div className="relative z-10 w-48 sm:w-52 md:w-60 lg:w-56 xl:w-64 flex-shrink-0 animate-fade-up">
+                                <div className="relative z-10 w-48 sm:w-52 md:w-60 lg:w-56 xl:w-64 shrink-0 animate-fade-up">
                                     <Image src="/images/Ricky_saluda.png" alt="Ricky saludando" width={400} height={400} className="w-full h-auto drop-shadow-xl animate-float" />
                                 </div>
                             </div>
@@ -166,7 +166,7 @@ export default function ContactPage() {
                                 <ul className="space-y-4">
                                     {['Pedidos', 'Consultas', 'Disponibilidad', 'Personalizaciones', 'Coordinación de compra'].map((item, i) => (
                                         <li key={i} className="flex items-center gap-3 animate-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
-                                            <div className="w-6 h-6 bg-[#E4072F] rounded-full flex items-center justify-center flex-shrink-0">
+                                            <div className="w-6 h-6 bg-[#E4072F] rounded-full flex items-center justify-center shrink-0">
                                                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -217,13 +217,13 @@ export default function ContactPage() {
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
-                    <div className="w-32 md:w-40 lg:w-48 flex-shrink-0 relative animate-pop" style={{ animationDelay: '100ms' }}>
+                    <div className="w-32 md:w-40 lg:w-48 shrink-0 relative animate-pop" style={{ animationDelay: '100ms' }}>
                         <Image src="/images/Ricky_phone.png" alt="Ricky en el teléfono" width={200} height={200} className="w-full h-auto drop-shadow-lg" />
                     </div>
                     
-                    <div className="bg-white border-[4px] border-[#111111] rounded-[24px] p-6 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] w-full max-w-2xl text-left relative flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-up">
+                    <div className="bg-white border-4 border-[#111111] rounded-[24px] p-6 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] w-full max-w-2xl text-left relative flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-up">
                         {/* Tail border */}
-                        <div className="absolute -top-[12px] left-1/2 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:-left-[12px] md:translate-x-0 w-6 h-6 border-t-[4px] border-l-[4px] border-[#111111] transform rotate-45 md:-rotate-45 z-[-1]"></div>
+                        <div className="absolute -top-[12px] left-1/2 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:-left-[12px] md:translate-x-0 w-6 h-6 border-t-4 border-l-4 border-[#111111] transform rotate-45 md:-rotate-45 z-[-1]"></div>
                         {/* Tail background */}
                         <div className="absolute -top-[4px] left-1/2 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 md:-left-[4px] md:translate-x-0 w-6 h-6 bg-white transform rotate-45 md:-rotate-45"></div>
 
@@ -234,7 +234,7 @@ export default function ContactPage() {
                         
                         <a 
                             href="https://wa.me/123456789" 
-                            className="contact-button inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold shadow-md flex-shrink-0"
+                            className="contact-button inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold shadow-md shrink-0"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                             Hablemos por WhatsApp

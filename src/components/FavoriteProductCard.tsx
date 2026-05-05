@@ -49,27 +49,30 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
   const whatsappHref = `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hola! Queria consultar por ${product.nombre}.`)}`;
   const categoryColor = product.category?.color || '#dc1537';
   
-  const typeString = product.label || product.category?.nombre || product.tipo || 'default';
-  const hash = typeString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const tapeColors = ['#dc1537', '#e9bbff', '#fca5a5', '#f4a261', '#4ade80', '#60a5fa'];
-  const tapeColor = product.category?.color || tapeColors[hash % tapeColors.length];
+  const label = product.label || '';
   
-  const description = product.descripcion?.trim();
+  // Mapeo visual basado en etiqueta comercial
+  let tapeColor = '#dc1537';
+  let renderDecorativeDoodle = () => <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-rosa-empolvado opacity-80 transition-transform duration-500 group-hover:rotate-12" />;
 
-  // Doodles decorativos alternos
-  const renderDecorativeDoodle = () => {
-    switch (index % 4) {
-      case 0:
-        return <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-rosa-empolvado opacity-80 transition-transform duration-500 group-hover:rotate-12" />;
-      case 1:
-        return <HeartDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-coral/40 opacity-80 transition-transform duration-500 group-hover:-rotate-12" />;
-      case 2:
-        return <SmileyFlowerDoodle className="absolute -right-5 bottom-0 z-20 h-14 w-14 text-lila-suave opacity-80 transition-transform duration-500 group-hover:rotate-45" />;
-      case 3:
-      default:
-        return <GlassesDoodle className="absolute -right-2 bottom-4 z-20 h-8 w-16 text-gray-200 opacity-80 transition-transform duration-500 group-hover:-rotate-6" />;
-    }
-  };
+  if (label === 'Locamente Favoritos') {
+    tapeColor = '#dc1537'; // coral/rojo
+    renderDecorativeDoodle = () => <HeartDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-coral/40 opacity-80 transition-transform duration-500 group-hover:-rotate-12" />;
+  } else if (label === 'Best Seller') {
+    tapeColor = '#f4a261'; // naranja cálido
+    renderDecorativeDoodle = () => <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-amber-300 opacity-80 transition-transform duration-500 group-hover:rotate-12" />;
+  } else if (label === 'Novedades') {
+    tapeColor = '#60a5fa'; // celeste fresco
+    renderDecorativeDoodle = () => <SmileyFlowerDoodle className="absolute -right-5 bottom-0 z-20 h-14 w-14 text-blue-200 opacity-80 transition-transform duration-500 group-hover:rotate-45" />;
+  } else {
+    // Fallback para otras etiquetas
+    const hash = label.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const tapeColors = ['#e9bbff', '#fca5a5', '#4ade80'];
+    tapeColor = product.category?.color || tapeColors[hash % tapeColors.length];
+    renderDecorativeDoodle = () => <GlassesDoodle className="absolute -right-2 bottom-4 z-20 h-8 w-16 text-gray-200 opacity-80 transition-transform duration-500 group-hover:-rotate-6" />;
+  }
+
+  const description = product.descripcion?.trim() || 'Una pieza única hecha a mano con mucho amor y dedicación. Ideal para darle un toque especial a tu día.';
 
   return (
     <article className="group relative flex h-full flex-col lg:flex-row lg:items-center rounded-[40px] border border-white/80 bg-white/95 p-5 shadow-[0_24px_70px_-32px_rgba(220,21,55,0.45)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_32px_90px_-36px_rgba(220,21,55,0.55)] sm:p-8 lg:p-10 lg:gap-12">
@@ -77,7 +80,7 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
 
       <div className="relative mb-7 lg:mb-0 lg:w-2/5 shrink-0">
         <div
-          className={`relative z-10 aspect-[4/3] overflow-hidden border-[10px] border-white bg-gray-50 shadow-[0_22px_45px_-24px_rgba(17,24,39,0.55)] transition-transform duration-700 group-hover:rotate-0 ${frame.rotate}`}
+          className={`relative z-10 aspect-4/3 overflow-hidden border-10 border-white bg-gray-50 shadow-[0_22px_45px_-24px_rgba(17,24,39,0.55)] transition-transform duration-700 group-hover:rotate-0 ${frame.rotate}`}
           style={{ borderRadius: frame.radius }}
         >
           <Link href={detailHref} aria-label={`Ver detalles de ${product.nombre}`}>
@@ -125,11 +128,9 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
           </Link>
         </h3>
 
-        {description && (
-          <p className="mb-6 line-clamp-2 md:line-clamp-3 text-sm md:text-base font-medium leading-relaxed text-gray-600">
-            {description}
-          </p>
-        )}
+        <p className="mb-6 line-clamp-2 md:line-clamp-3 text-sm md:text-base font-medium leading-relaxed text-gray-600">
+          {description}
+        </p>
 
         <div className="mt-auto space-y-5">
           <div className="flex items-end justify-between gap-4 border-t border-rose-50 pt-5">

@@ -18,8 +18,12 @@ export default async function HomePage() {
     ? await apiService.getEligibleFeaturedProducts({ limit: 3, ids: featuredProductIds, imageMode: 'cover' })
     : await apiService.getEligibleFeaturedProducts({ imageMode: 'cover' });
 
-  // Lógica de selección de productos: priorizar variedad de tipos (categoría, label o tipo básico)
-  const getProductType = (p: Product) => p.label || p.category?.nombre || p.tipo;
+  // Lógica de selección de productos: priorizar variedad por etiquetas comerciales
+  const TARGET_LABELS = [
+    "Locamente Favoritos",
+    "Best Seller",
+    "Novedades"
+  ];
   
   const candidates = featuredProductIds.length === 0
     ? configuredFeatured
@@ -28,24 +32,25 @@ export default async function HomePage() {
       .filter((p: Product | undefined): p is Product => !!p);
 
   const selectedProducts: Product[] = [];
-  const usedTypes = new Set<string>();
   const MAX_FEATURED = 3;
 
-  // Primera pasada: intentar obtener uno de cada tipo distinto
-  for (const p of candidates) {
-    if (selectedProducts.length >= MAX_FEATURED) break;
-    const type = getProductType(p);
-    if (!usedTypes.has(type)) {
-      selectedProducts.push(p);
-      usedTypes.add(type);
+  // Primera pasada: intentar obtener uno de cada etiqueta comercial prioritaria
+  for (const targetLabel of TARGET_LABELS) {
+    const found = candidates.find(p => 
+      p.label === targetLabel && !selectedProducts.some(s => s.id === p.id)
+    );
+    if (found) {
+      selectedProducts.push(found);
     }
   }
 
   // Segunda pasada: rellenar con los que faltan respetando el orden original si no se cubrió el cupo
-  for (const p of candidates) {
-    if (selectedProducts.length >= MAX_FEATURED) break;
-    if (!selectedProducts.find(s => s.id === p.id)) {
-      selectedProducts.push(p);
+  if (selectedProducts.length < MAX_FEATURED) {
+    for (const p of candidates) {
+      if (selectedProducts.length >= MAX_FEATURED) break;
+      if (!selectedProducts.some(s => s.id === p.id)) {
+        selectedProducts.push(p);
+      }
     }
   }
 
