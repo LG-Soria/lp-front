@@ -345,7 +345,12 @@ export default function ProductModal({ product, categories, isOpen, onClose, onS
                                 {formData.imagenes?.map((img, index) => (
                                     img && (
                                         <div key={index} className="relative aspect-square rounded-[24px] overflow-hidden group border-2 border-white shadow-sm hover:shadow-md transition-all">
-                                            <OptimizedImage src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                            <OptimizedImage
+                                                src={img}
+                                                alt={`Preview ${index}`}
+                                                className="w-full h-full object-cover"
+                                                variant="preview"
+                                            />
                                             <button
                                                 type="button"
                                                 onClick={() => {

@@ -1,4 +1,4 @@
-import { Product, Category, HomeConfig, PaginatedResponse } from '@/types';
+import { Product, Category, HomeConfig, PaginatedResponse, ProductSearchResult } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const PUBLIC_REVALIDATE_SECONDS = 120;
@@ -125,17 +125,22 @@ export const apiService = {
         return handleResponse<Product>(response).catch(() => null);
     },
 
-    async searchProducts(query: string): Promise<Product[]> {
+    async searchProducts(query: string, limit = 8): Promise<ProductSearchResult[]> {
         if (!query || query.trim() === '') {
             return [];
         }
 
-        const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}`, withNoStore());
-        return handleResponse<Product[]>(response).catch(() => []);
+        const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}&limit=${limit}`, withNoStore());
+        return handleResponse<ProductSearchResult[]>(response).catch(() => []);
     },
 
-    async getEligibleFeaturedProducts(): Promise<Product[]> {
-        const response = await fetch(`${API_BASE_URL}/products/eligible-featured`, withPublicCache());
+    async getEligibleFeaturedProducts(params: { limit?: number; ids?: string[]; imageMode?: 'cover' | 'gallery' } = {}): Promise<Product[]> {
+        const { ids, ...rest } = params;
+        const query = buildQueryString({
+            ...rest,
+            ...(ids && ids.length > 0 ? { ids: ids.join(',') } : {}),
+        });
+        const response = await fetch(`${API_BASE_URL}/products/eligible-featured${query ? `?${query}` : ''}`, withPublicCache());
         return handleResponse<Product[]>(response).catch(() => []);
     },
 

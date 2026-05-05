@@ -3,12 +3,36 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
+type ImageVariant =
+    | 'thumbnail'
+    | 'adminThumb'
+    | 'cart'
+    | 'card'
+    | 'featured'
+    | 'detail'
+    | 'hero'
+    | 'logo'
+    | 'preview';
+
+const IMAGE_VARIANTS: Record<ImageVariant, { width: number; height: number; sizes: string }> = {
+    thumbnail: { width: 80, height: 80, sizes: '80px' },
+    adminThumb: { width: 96, height: 96, sizes: '96px' },
+    cart: { width: 128, height: 128, sizes: '128px' },
+    card: { width: 400, height: 500, sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw' },
+    featured: { width: 600, height: 750, sizes: '(max-width: 1024px) 90vw, 40vw' },
+    detail: { width: 1200, height: 1500, sizes: '(max-width: 1024px) 100vw, 50vw' },
+    hero: { width: 1400, height: 900, sizes: '(max-width: 1024px) 100vw, 50vw' },
+    logo: { width: 200, height: 64, sizes: '200px' },
+    preview: { width: 400, height: 400, sizes: '(max-width: 768px) 50vw, 400px' },
+};
+
 interface OptimizedImageProps {
     src: string;
     alt: string;
     className?: string;
     priority?: boolean;
     fill?: boolean;
+    variant?: ImageVariant;
     sizes?: string;
     width?: number;
     height?: number;
@@ -25,6 +49,7 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
     className = '',
     priority = false,
     fill = false,
+    variant,
     sizes,
     width,
     height,
@@ -32,7 +57,10 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const isRawImageSource = src.startsWith('data:') || src.startsWith('blob:');
-    const resolvedSizes = sizes || (fill ? '100vw' : undefined);
+    const variantConfig = variant ? IMAGE_VARIANTS[variant] : undefined;
+    const resolvedWidth = width ?? variantConfig?.width ?? 800;
+    const resolvedHeight = height ?? variantConfig?.height ?? 800;
+    const resolvedSizes = sizes || variantConfig?.sizes || (fill ? '100vw' : undefined);
 
     if (isRawImageSource) {
         return (
@@ -41,8 +69,8 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                 src={src}
                 alt={alt}
                 className={className}
-                width={width}
-                height={height}
+                width={!fill ? resolvedWidth : undefined}
+                height={!fill ? resolvedHeight : undefined}
                 loading={priority ? 'eager' : 'lazy'}
                 style={{ objectFit }}
             />
@@ -60,8 +88,8 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                 className={className}
                 priority={priority}
                 fill={fill}
-                width={!fill ? (width ?? 1200) : undefined}
-                height={!fill ? (height ?? 1200) : undefined}
+                width={!fill ? resolvedWidth : undefined}
+                height={!fill ? resolvedHeight : undefined}
                 sizes={resolvedSizes}
                 onLoad={() => setIsLoading(false)}
                 style={{ objectFit }}

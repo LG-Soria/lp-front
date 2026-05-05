@@ -9,19 +9,22 @@ import { ClientWavyBackground } from '@/components/background/ClientWavyBackgrou
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
 
 export default async function HomePage() {
-  const [productsData, config, eligibleProducts] = await Promise.all([
-    apiService.getProducts({ limit: 3 }),
+  const [productsData, config] = await Promise.all([
+    apiService.getProducts({ limit: 3, imageMode: 'cover' }),
     apiService.getHomeConfig(),
-    apiService.getEligibleFeaturedProducts()
   ]);
 
   const products = productsData.items;
+  const featuredProductIds = config?.featuredProductIds?.slice(0, 3) ?? [];
+  const configuredFeatured = featuredProductIds.length > 0
+    ? await apiService.getEligibleFeaturedProducts({ limit: 3, ids: featuredProductIds, imageMode: 'cover' })
+    : [];
 
   // Determinar los productos destacados
-  const featured = !config || !config.featuredProductIds || config.featuredProductIds.length === 0
+  const featured = featuredProductIds.length === 0
     ? products.slice(0, 3)
-    : config.featuredProductIds
-      .map((id: string) => eligibleProducts.find(p => p.id === id))
+    : featuredProductIds
+      .map((id: string) => configuredFeatured.find(p => p.id === id))
       .filter((p: Product | undefined): p is Product => !!p);
 
 
@@ -74,7 +77,7 @@ export default async function HomePage() {
                 className="w-full h-[600px] object-cover"
                 alt="Tejido artesanal"
                 priority={true}
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                variant="hero"
               />
             </div>
             <SmileyFlowerDoodle className="absolute -top-12 -right-12 w-64 h-64 -z-10 rotate-12" />
@@ -121,7 +124,7 @@ export default async function HomePage() {
                       src={product.imagenes[0]}
                       alt={product.nombre}
                       className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
-                      sizes="(max-width: 1024px) 90vw, 40vw"
+                      variant="featured"
                     />
                     <div className="absolute inset-0 bg-coral/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
@@ -223,6 +226,8 @@ export default async function HomePage() {
               src={RICKY_URL}
               alt="Ricky el ovillo"
               className="w-full h-full object-contain drop-shadow-2xl floating-doodle"
+              width={288}
+              height={288}
               sizes="(max-width: 1024px) 256px, 288px"
             />
           </div>

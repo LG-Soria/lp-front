@@ -56,11 +56,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
               src={product.imagenes[0]}
               alt={product.nombre}
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              variant="card"
             />
 
             {/* Overlay de textura de papel sutil */}
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cardboard-flat.png')] opacity-10 pointer-events-none"></div>
+            <div className="absolute border border-back inset-0 bg-[url('https://www.transparenttextures.com/patterns/cardboard-flat.png')] opacity-10 pointer-events-none"></div>
           </Link>
 
           {/* Badge de Estado como Sticker */}

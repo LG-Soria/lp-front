@@ -28,7 +28,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ imagen
                         alt={nombre}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                         priority={true}
-                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        variant="detail"
                     />
 
                     <StickerDoodle
@@ -54,8 +54,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ imagen
                                 src={img}
                                 className="w-full h-full object-cover"
                                 alt={`Miniatura ${idx + 1}`}
-                                width={80}
-                                height={80}
+                                variant="thumbnail"
                             />
                         </button>
                     ))}

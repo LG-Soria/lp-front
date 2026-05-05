@@ -51,6 +51,8 @@ export interface Product {
   category?: Category;
 }
 
+export type ProductSearchResult = Pick<Product, 'id' | 'nombre' | 'descripcion' | 'precio' | 'imagenes'>;
+
 export interface CartItem extends Product {
   quantity: number;
 }

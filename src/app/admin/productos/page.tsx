@@ -108,6 +108,7 @@ export default function AdminProductsPage() {
                             src={product.imagenes[0]}
                             alt={product.nombre}
                             className="w-full h-full object-cover"
+                            variant="adminThumb"
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">

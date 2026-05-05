@@ -26,6 +26,7 @@ export default async function CategoryPage({
     const data = await apiService.getProducts({
         page: currentPage,
         limit: LIMIT,
+        imageMode: 'cover',
         categoryId,
         tipo: activeType || undefined,
     });

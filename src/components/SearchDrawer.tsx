@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiService } from '@/services/apiService';
-import { Product } from '@/types';
+import { ProductSearchResult } from '@/types';
 import { OptimizedImage } from './OptimizedImage';
 
 interface SearchDrawerProps {
@@ -13,7 +13,7 @@ interface SearchDrawerProps {
 
 const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<Product[]>([]);
+    const [searchResults, setSearchResults] = useState<ProductSearchResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const router = useRouter();
 
@@ -93,8 +93,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                                 alt="Locas Puntadas"
                                 className="h-16 w-auto object-contain mb-3"
                                 priority={true}
-                                width={200}
-                                height={64}
+                                variant="logo"
                             />
                             <h2 className="text-2xl font-serif italic text-gray-800 mb-6">Búsqueda</h2>
 
@@ -154,8 +153,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
                                                     src={product.imagenes[0]}
                                                     alt={product.nombre}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                    width={80}
-                                                    height={80}
+                                                    variant="thumbnail"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-300">
