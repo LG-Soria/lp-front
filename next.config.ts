@@ -2,6 +2,23 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  async headers() {
+    const homeBackgroundPreload = {
+      key: "Link",
+      value: "</images/home-bg.png>; rel=preload; as=image; fetchpriority=high",
+    };
+
+    return [
+      {
+        source: "/",
+        headers: [homeBackgroundPreload],
+      },
+      {
+        source: "/producto/:id",
+        headers: [homeBackgroundPreload],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

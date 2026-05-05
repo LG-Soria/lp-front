@@ -18,10 +18,10 @@ const IMAGE_VARIANTS: Record<ImageVariant, { width: number; height: number; size
     thumbnail: { width: 80, height: 80, sizes: '80px' },
     adminThumb: { width: 96, height: 96, sizes: '96px' },
     cart: { width: 128, height: 128, sizes: '128px' },
-    card: { width: 400, height: 500, sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw' },
-    featured: { width: 600, height: 750, sizes: '(max-width: 1024px) 90vw, 40vw' },
-    detail: { width: 1200, height: 1500, sizes: '(max-width: 1024px) 100vw, 50vw' },
-    hero: { width: 1400, height: 900, sizes: '(max-width: 1024px) 100vw, 50vw' },
+    card: { width: 400, height: 500, sizes: '(max-width: 640px) calc(100vw - 64px), (max-width: 1024px) calc(50vw - 60px), 25vw' },
+    featured: { width: 600, height: 750, sizes: '(max-width: 640px) calc(100vw - 32px), 400px' },
+    detail: { width: 1200, height: 1500, sizes: '(max-width: 1024px) calc(100vw - 64px), 50vw' },
+    hero: { width: 1400, height: 900, sizes: '(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 448px, 50vw' },
     logo: { width: 200, height: 64, sizes: '200px' },
     preview: { width: 400, height: 400, sizes: '(max-width: 768px) 50vw, 400px' },
 };
@@ -31,6 +31,7 @@ interface OptimizedImageProps {
     alt: string;
     className?: string;
     priority?: boolean;
+    fetchPriority?: 'high' | 'low' | 'auto';
     fill?: boolean;
     variant?: ImageVariant;
     sizes?: string;
@@ -48,6 +49,7 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
     alt,
     className = '',
     priority = false,
+    fetchPriority,
     fill = false,
     variant,
     sizes,
@@ -72,6 +74,7 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                 width={!fill ? resolvedWidth : undefined}
                 height={!fill ? resolvedHeight : undefined}
                 loading={priority ? 'eager' : 'lazy'}
+                fetchPriority={fetchPriority}
                 style={{ objectFit }}
             />
         );
@@ -91,6 +94,7 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
                 width={!fill ? resolvedWidth : undefined}
                 height={!fill ? resolvedHeight : undefined}
                 sizes={resolvedSizes}
+                fetchPriority={fetchPriority}
                 onLoad={() => setIsLoading(false)}
                 style={{ objectFit }}
             />

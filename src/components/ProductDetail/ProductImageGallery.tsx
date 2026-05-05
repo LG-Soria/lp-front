@@ -28,6 +28,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ imagen
                         alt={nombre}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                         priority={true}
+                        fetchPriority="high"
                         variant="detail"
                     />
 

@@ -1,12 +1,7 @@
-'use client';
-
-import dynamic from 'next/dynamic';
+import { WavyCheckerboardBackground } from './WavyCheckerboardBg';
 
 /**
- * Wrapper de cliente para el fondo pesado para evitar que el SVG
- * sea parte del SSR inicial y cause errores de dynamic en Server Components.
+ * Wrapper mantenido para no tocar los imports existentes.
+ * Renderiza en SSR para que el color base y el background se descubran antes.
  */
-export const ClientWavyBackground = dynamic(
-    () => import('./WavyCheckerboardBg').then(m => m.WavyCheckerboardBackground),
-    { ssr: false }
-);
+export const ClientWavyBackground = WavyCheckerboardBackground;

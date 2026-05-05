@@ -77,6 +77,7 @@ export default async function HomePage() {
                 className="w-full h-[600px] object-cover"
                 alt="Tejido artesanal"
                 priority={true}
+                fetchPriority="high"
                 variant="hero"
               />
             </div>
