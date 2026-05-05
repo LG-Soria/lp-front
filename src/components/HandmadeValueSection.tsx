@@ -2,6 +2,15 @@ import React from 'react';
 import Image from 'next/image';
 
 export const HandmadeValueSection = () => {
+  const handmadeAssets = {
+    canasto: "/images/elementos/E_1.png",
+    tejidoRosa: "/images/elementos/E_2.png",
+    granny: "/images/elementos/E_3.png",
+    ramita: "/images/elementos/E_4.png",
+    corazon: "/images/elementos/E_5.png",
+    hilo: "/images/elementos/E_6.png",
+  };
+
   return (
     <section className="relative w-full overflow-hidden bg-[#FEF4F4] py-16 lg:py-0 lg:h-[780px] flex items-center justify-center my-16">
       {/* Background Decorativo */}
@@ -30,7 +39,7 @@ export const HandmadeValueSection = () => {
           {/* Item 5: Corazón tejido colgante */}
           <div className="absolute -top-12 left-4 md:left-8 lg:-top-16 lg:left-8 z-30 w-28 h-28 lg:w-36 lg:h-36 drop-shadow-md">
             <Image 
-              src="/images/elementos/E_5.png" 
+              src={handmadeAssets.corazon}
               alt="Corazón tejido" 
               fill
               className="object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.1)]"
@@ -85,22 +94,22 @@ export const HandmadeValueSection = () => {
             
             {/* Item 4: Ramita floral (Atrás) */}
             <div className="absolute right-[18%] bottom-[32%] lg:bottom-[36%] z-0 w-32 h-48 lg:w-[180px] lg:h-[260px] opacity-85">
-              <Image src="/images/elementos/E_4.png" alt="Decoración floral" fill className="object-contain" sizes="(max-width: 1024px) 128px, 180px" loading="lazy" />
+              <Image src={handmadeAssets.ramita} alt="Decoración floral" fill className="object-contain" sizes="(max-width: 1024px) 128px, 180px" loading="lazy" />
             </div>
 
             {/* Item 1: Canasto con ovillos (Principal) */}
             <div className="absolute right-[6%] bottom-[16%] lg:bottom-[22%] z-10 w-64 h-56 lg:w-[420px] lg:h-[360px]">
-              <Image src="/images/elementos/E_1.png" alt="Canasto con ovillos" fill className="object-contain drop-shadow-2xl" sizes="(max-width: 1024px) 256px, 420px" priority />
+              <Image src={handmadeAssets.canasto} alt="Canasto con ovillos" fill className="object-contain drop-shadow-2xl" sizes="(max-width: 1024px) 256px, 420px" priority />
             </div>
 
             {/* Item 3: Granny square floral */}
             <div className="absolute right-[24%] bottom-[10%] lg:bottom-[14%] z-20 w-32 h-32 lg:w-48 lg:h-48 rotate-[-5deg]">
-              <Image src="/images/elementos/E_3.png" alt="Granny square" fill className="object-contain drop-shadow-xl" sizes="(max-width: 1024px) 128px, 192px" loading="lazy" />
+              <Image src={handmadeAssets.granny} alt="Granny square" fill className="object-contain drop-shadow-xl" sizes="(max-width: 1024px) 128px, 192px" loading="lazy" />
             </div>
 
             {/* Item 2: Tejido rosa con etiqueta (Frente) */}
             <div className="absolute right-[2%] bottom-[6%] lg:bottom-[10%] z-30 w-36 h-28 lg:w-[240px] lg:h-[180px] rotate-[4deg]">
-              <Image src="/images/elementos/E_2.png" alt="Tejido rosa con etiqueta" fill className="object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)]" sizes="(max-width: 1024px) 144px, 240px" />
+              <Image src={handmadeAssets.tejidoRosa} alt="Tejido rosa con etiqueta" fill className="object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)]" sizes="(max-width: 1024px) 144px, 240px" />
             </div>
           </div>
         </div>
@@ -109,7 +118,7 @@ export const HandmadeValueSection = () => {
 
       {/* Item 6: Hilo ondulado con corazón (Abajo) */}
       <div className="absolute -bottom-2 lg:bottom-[5%] left-0 z-40 w-full sm:w-[80%] lg:w-[55%] h-24 lg:h-32 pointer-events-none">
-        <Image src="/images/elementos/E_6.png" alt="Hilo decorativo" fill className="object-contain object-left-bottom opacity-90" sizes="50vw" aria-hidden="true" />
+        <Image src={handmadeAssets.hilo} alt="Hilo decorativo" fill className="object-contain object-left-bottom opacity-90" sizes="50vw" aria-hidden="true" />
       </div>
 
     </section>
