@@ -3,12 +3,12 @@ import Image from 'next/image';
 
 export const HandmadeValueSection = () => {
   const handmadeAssets = {
-    canasto: "/images/elementos/E_1.png",
-    tejidoRosa: "/images/elementos/E_2.png",
-    granny: "/images/elementos/E_3.png",
-    ramita: "/images/elementos/E_4.png",
-    corazon: "/images/elementos/E_5.png",
-    hilo: "/images/elementos/E_6.png",
+    canasto: "/images/Elementos/E_1.png",
+    tejidoRosa: "/images/Elementos/E_2.png",
+    granny: "/images/Elementos/E_3.png",
+    ramita: "/images/Elementos/E_4.png",
+    corazon: "/images/Elementos/E_5.png",
+    hilo: "/images/Elementos/E_6.png",
   };
 
   return (
