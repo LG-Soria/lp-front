@@ -48,10 +48,19 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
   const whatsappPhone = process.env.NEXT_PUBLIC_WA_PHONE || '5491112345678';
   const whatsappHref = `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(`Hola! Queria consultar por ${product.nombre}.`)}`;
   const categoryColor = product.category?.color || '#dc1537';
+
+  const normalizeLabel = (l: string | null | undefined): string => {
+    if (!l) return '';
+    const str = l.toLowerCase().trim().replace(/[-_]/g, ' ');
+    if (str.includes('novedad') || str.includes('nuev')) return 'Novedades';
+    if (str.includes('best') || str.includes('seller') || str.includes('vendid')) return 'Best Seller';
+    if (str.includes('locamente') || str.includes('favorit')) return 'Locamente Favoritos';
+    return l;
+  };
+
+  const label = normalizeLabel(product.label);
   
-  const label = product.label || '';
-  
-  // Mapeo visual basado en etiqueta comercial
+  // Mapeo visual basado en etiqueta comercial normalizada
   let tapeColor = '#dc1537';
   let renderDecorativeDoodle = () => <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-rosa-empolvado opacity-80 transition-transform duration-500 group-hover:rotate-12" />;
 

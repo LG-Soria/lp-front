@@ -6,7 +6,7 @@ import { StarDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, S
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { ClientWavyBackground } from '@/components/background/ClientWavyBackground';
 import { FavoriteProductCard } from '@/components/FavoriteProductCard';
-
+import { HandmadeValueSection } from '@/components/HandmadeValueSection';
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
 
 
@@ -152,26 +152,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Filosofía Artesanal */}
-      <section className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-rosa-pastel/50 skew-y-3 -z-10"></div>
-        <div className="container mx-auto px-4 max-w-4xl relative text-center">
-          <GlassesDoodle className="absolute -top-10 -right-10 w-48 h-48 opacity-10" />
-          <StarDoodle className="absolute -bottom-10 -left-10 w-24 h-24 text-lila-suave" />
-
-          <h2 className="text-4xl md:text-5xl font-heading font-bold mb-10 leading-tight">
-            El valor de lo <br /><span className="font-script text-coral text-6xl">hecho a mano</span>
-          </h2>
-          <div className="space-y-8">
-            <p className="text-2xl text-gray-700 font-medium leading-relaxed italic">
-              &quot;No buscamos la perfección de las máquinas, sino la calidez de las manos. Cada punto cuenta una historia y cada nudo es un compromiso con la paciencia.&quot;
-            </p>
-            <p className="text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto">
-              En LocasPuntadas, no solo vendemos tejidos; compartimos un proceso artesanal honesto. Creemos en la sostenibilidad del tiempo y el respeto por el material.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Filosofía Artesanal - Refactorizada */}
+      <HandmadeValueSection />
 
       {/* Sección de Ricky - Contacto Personalizado */}
       <section className="container mx-auto px-4 py-20 overflow-hidden">
