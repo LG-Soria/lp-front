@@ -47,6 +47,12 @@ interface HomeConfigResponse extends HomeConfig {
     [key: string]: unknown;
 }
 
+const DEFAULT_HOME_CONFIG: HomeConfigResponse = {
+    id: 'default',
+    heroImageUrl: null,
+    featuredProductIds: [],
+};
+
 const getAuthHeaders = () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('lp_admin_token') : null;
     return {
@@ -326,7 +332,7 @@ export const apiService = {
     // Configuracion de Home
     async getHomeConfig(): Promise<HomeConfigResponse> {
         const response = await fetch(`${API_BASE_URL}/home-config`, withPublicCache());
-        return handleResponse<HomeConfigResponse>(response);
+        return handleResponse<HomeConfigResponse>(response).catch(() => DEFAULT_HOME_CONFIG);
     },
 
     async updateHomeConfig(data: JsonRecord): Promise<HomeConfigResponse> {

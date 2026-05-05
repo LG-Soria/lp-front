@@ -1,31 +1,32 @@
 import React from 'react';
 import Link from 'next/link';
 import { apiService } from '@/services/apiService';
-import { Product, ProductType } from '@/types';
-import { StarDoodle, TapeDoodle, StickerDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, SpeechBubble } from '@/components/doodles';
+import { Product } from '@/types';
+import { StarDoodle, WavyLine, GlassesDoodle, SmileyFlowerDoodle, HeartDoodle, SpeechBubble } from '@/components/doodles';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { ClientWavyBackground } from '@/components/background/ClientWavyBackground';
+import { FavoriteProductCard } from '@/components/FavoriteProductCard';
 
 const RICKY_URL = "https://i.ibb.co/HTyR7k5Z/Chat-GPT-Image-27-dic-2025-11-15-30-p-m-removebg-preview.png";
+const FAVORITES_LABEL = 'Locamente Favoritos';
 
 export default async function HomePage() {
-  const [productsData, config] = await Promise.all([
-    apiService.getProducts({ limit: 3, imageMode: 'cover' }),
-    apiService.getHomeConfig(),
-  ]);
+  const config = await apiService.getHomeConfig();
 
-  const products = productsData.items;
   const featuredProductIds = config?.featuredProductIds?.slice(0, 3) ?? [];
   const configuredFeatured = featuredProductIds.length > 0
     ? await apiService.getEligibleFeaturedProducts({ limit: 3, ids: featuredProductIds, imageMode: 'cover' })
-    : [];
+    : await apiService.getEligibleFeaturedProducts({ imageMode: 'cover' });
 
-  // Determinar los productos destacados
-  const featured = featuredProductIds.length === 0
-    ? products.slice(0, 3)
+  // Determinar los productos favoritos manteniendo el orden configurado.
+  const featuredCandidates = featuredProductIds.length === 0
+    ? configuredFeatured
     : featuredProductIds
       .map((id: string) => configuredFeatured.find(p => p.id === id))
       .filter((p: Product | undefined): p is Product => !!p);
+  const featured = featuredCandidates
+    .filter((product: Product) => product.label === FAVORITES_LABEL)
+    .slice(0, 3);
 
 
   return (
@@ -88,9 +89,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Favoritos - Diseño alternado */}
+      {/* Favoritos */}
       <section className="container mx-auto px-4 relative">
-        <div className="text-center mb-32 relative">
+        <div className="text-center mb-16 md:mb-20 relative">
           <WavyLine className="absolute -top-8 left-1/2 -translate-x-1/2 w-48 text-coral opacity-30" />
           <h2 className="text-5xl md:text-6xl font-heading font-bold relative inline-block text-gray-900">
             Locamente <span className="font-script text-coral">Favoritos</span>
@@ -99,91 +100,18 @@ export default async function HomePage() {
           <p className="text-gray-500 font-medium mt-4">Nuestras creaciones más mimadas</p>
         </div>
 
-        <div className="space-y-48">
-          {featured.map((product: Product, index: number) => {
-            const isEven = index % 2 === 0;
-            const stickerTexts = ['Novedades', 'Best Seller', 'Locamente Favoritos'];
-            const stickerColors = ['#FB7185', '#7C3AED', '#F472B6'];
+        <div className="relative mx-auto max-w-7xl">
+          <div className="absolute -left-10 top-16 h-48 w-48 rounded-full bg-rosa-pastel/70 blur-3xl" />
+          <div className="absolute -right-8 bottom-10 h-56 w-56 rounded-full bg-lila-suave/80 blur-3xl" />
 
-            const stickerText = product.label || stickerTexts[index % stickerTexts.length];
-            const stickerColor = product.category?.color || stickerColors[index % stickerColors.length];
-
-            const shadowClasses = [
-              'group-hover:shadow-[0_40px_80px_-15px_rgba(251,113,133,0.4)]',
-              'group-hover:shadow-[0_40px_80px_-15px_rgba(124,58,237,0.3)]',
-              'group-hover:shadow-[0_40px_80px_-15px_rgba(244,114,182,0.4)]'
-            ];
-
-            return (
-              <div
-                key={product.id}
-                className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-24 relative group`}
-              >
-                <div className={`relative w-full max-w-[400px] shrink-0`}>
-                  <div className={`relative z-10 aspect-3/4 overflow-hidden rounded-full border-12 border-white shadow-2xl transform ${isEven ? 'rotate-2' : '-rotate-2'} group-hover:rotate-0 ${shadowClasses[index % 3]} transition-all duration-700`}>
-                    <OptimizedImage
-                      src={product.imagenes[0]}
-                      alt={product.nombre}
-                      className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
-                      variant="featured"
-                    />
-                    <div className="absolute inset-0 bg-coral/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </div>
-
-                  <div className={`absolute -inset-4 bg-rosa-pastel rounded-full -z-10 ${isEven ? '-rotate-3' : 'rotate-3'} opacity-50 blur-sm`}></div>
-
-                  <StickerDoodle
-                    text={stickerText}
-                    color={stickerColor}
-                    className={`absolute ${isEven ? '-top-10 -right-6' : '-top-10 -left-6'} z-20 scale-110 shadow-xl rotate-12 transition-all duration-500 group-hover:rotate-[-4deg] group-hover:-translate-y-6 group-hover:scale-125`}
-                  />
-                  <StarDoodle className={`absolute ${isEven ? '-bottom-10 -left-10' : '-bottom-10 -right-10'} w-16 h-16 text-lila-suave opacity-40`} />
-                  <TapeDoodle color={stickerColor} className={`absolute ${isEven ? 'bottom-20 -right-8' : 'bottom-20 -left-8'} rotate-90 opacity-40`} />
-                </div>
-
-                <div className={`grow text-center lg:text-left space-y-6 max-w-xl`}>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-coral font-bold uppercase tracking-[0.2em] text-xs">{product.category?.nombre}</span>
-                    <h3 className="text-4xl md:text-5xl font-heading font-bold text-gray-900">
-                      <Link href={`/producto/${product.id}`} className="hover:text-coral transition-colors duration-300">
-                        {product.nombre}
-                      </Link>
-                    </h3>
-                  </div>
-
-                  <p className="text-lg text-gray-600 leading-relaxed italic">
-                    &quot;{product.descripcion}&quot;
-                  </p>
-
-                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${product.tipo === ProductType.STOCK ? 'bg-green-50 text-green-600 border-green-100' :
-                      product.tipo === ProductType.PEDIDO ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                        'bg-rose-50 text-coral border-rose-100'
-                      }`}>
-                      {product.tipo === ProductType.STOCK ? 'Listo para enviar' : product.tipo === ProductType.PEDIDO ? 'Hecho para vos' : 'Personalizable'}
-                    </span>
-                    <span className="text-2xl font-bold text-gray-900">
-                      {product.precio ? `$${product.precio.toLocaleString('es-AR')}` : 'Consultar'}
-                    </span>
-                  </div>
-
-                  <div className="pt-6">
-                    <Link
-                      href={`/producto/${product.id}`}
-                      className="inline-flex items-center gap-4 bg-coral text-white px-10 py-4 rounded-full font-bold hover:bg-coral-dark transition-all shadow-xl shadow-rose-200 transform hover:-translate-y-1"
-                    >
-                      Ver detalles
-                    </Link>
-                  </div>
-                </div>
-
-                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] max-w-5xl -z-20 ${isEven ? 'bg-lila-suave/20' : 'bg-rosa-pastel/20'} rounded-[200px] blur-3xl ${isEven ? 'rotate-12' : '-rotate-12'}`}></div>
-              </div>
-            );
-          })}
+          <div className="relative grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 xl:items-stretch">
+            {featured.map((product: Product, index: number) => (
+              <FavoriteProductCard key={product.id} product={product} index={index} />
+            ))}
+          </div>
         </div>
 
-        <div className="mt-48 text-center">
+        <div className="mt-16 md:mt-20 text-center">
           <Link
             href="/categorias"
             className="group inline-flex items-center gap-4 bg-white border-2 border-coral/20 px-12 py-4 rounded-full text-coral font-bold hover:bg-coral hover:text-white hover:border-coral transition-all duration-300 shadow-lg shadow-coral/5"
