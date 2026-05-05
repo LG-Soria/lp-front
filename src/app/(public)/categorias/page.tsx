@@ -33,6 +33,9 @@ export default async function CategoryPage({
 
     const products = data.items;
     const totalPages = data.meta.totalPages;
+    const totalItems = data.meta.total;
+    const startItem = totalItems === 0 ? 0 : (currentPage - 1) * LIMIT + 1;
+    const endItem = Math.min(startItem + products.length - 1, totalItems);
 
     return (
         <div className="container mx-auto px-8 md:px-16 lg:px-24 py-20 min-h-screen bg-doodle-dots relative">
@@ -55,6 +58,19 @@ export default async function CategoryPage({
                 activeCategory={activeCategory}
                 activeType={activeType}
             />
+
+            {/* Indicador de elementos mostrados */}
+            {totalItems > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between mb-8 relative z-10 px-6 py-4 bg-white/70 backdrop-blur-md rounded-[30px] border border-white/60 shadow-sm">
+                    <p className="text-gray-500 font-medium text-sm md:text-base">
+                        Mostrando <span className="text-coral font-bold mx-1">{startItem} - {endItem}</span> de <span className="text-gray-800 font-bold mx-1">{totalItems}</span> piezas
+                    </p>
+                    <div className="h-px bg-gray-200 flex-grow mx-6 opacity-50 hidden sm:block"></div>
+                    <div className="mt-2 sm:mt-0 opacity-40">
+                        <StarDoodle className="w-6 h-6 text-coral" />
+                    </div>
+                </div>
+            )}
 
             {/* Grid de productos */}
             {products.length > 0 ? (

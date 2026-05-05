@@ -101,7 +101,7 @@ export default async function HomePage() {
           <div className="absolute -left-10 top-16 h-48 w-48 rounded-full bg-rosa-pastel/70 blur-3xl" />
           <div className="absolute -right-8 bottom-10 h-56 w-56 rounded-full bg-lila-suave/80 blur-3xl" />
 
-          <div className="relative grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 xl:items-stretch">
+          <div className="relative flex flex-col gap-12 md:gap-16 max-w-5xl mx-auto">
             {featured.map((product: Product, index: number) => (
               <FavoriteProductCard key={product.id} product={product} index={index} />
             ))}

@@ -10,19 +10,29 @@ interface FavoriteProductCardProps {
 
 const imageFrames = [
   {
-    radius: '58% 42% 52% 48% / 46% 58% 42% 54%',
+    radius: '60% 40% 40% 60% / 55% 50% 50% 45%', // Wide organic oval / deformed capsule
     rotate: 'rotate-2',
     accent: 'bg-rosa-pastel',
   },
   {
-    radius: '38% 62% 45% 55% / 56% 42% 58% 44%',
+    radius: '35% 65% 55% 45% / 60% 40% 60% 40%', // Irregular squircle
     rotate: '-rotate-2',
     accent: 'bg-lila-suave',
   },
   {
-    radius: '50% 50% 42% 58% / 62% 46% 54% 38%',
+    radius: '45% 55% 35% 65% / 50% 60% 40% 50%', // Soft asymmetrical blob
     rotate: 'rotate-1',
     accent: 'bg-rose-50',
+  },
+  {
+    radius: '75% 25% 75% 25% / 45% 55% 45% 55%', // Tilted oval / horizontal organic
+    rotate: '-rotate-1',
+    accent: 'bg-rosa-pastel',
+  },
+  {
+    radius: '50% 50% 25% 75% / 25% 75% 25% 75%', // Very rounded but distinct silhouette
+    rotate: 'rotate-3',
+    accent: 'bg-lila-suave/40',
   },
 ];
 
@@ -41,10 +51,10 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
   const description = product.descripcion?.trim();
 
   return (
-    <article className="group relative flex h-full flex-col rounded-[40px] border border-white/80 bg-white/95 p-5 shadow-[0_24px_70px_-32px_rgba(220,21,55,0.45)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_32px_90px_-36px_rgba(220,21,55,0.55)] sm:p-6">
+    <article className="group relative flex h-full flex-col lg:flex-row lg:items-center rounded-[40px] border border-white/80 bg-white/95 p-5 shadow-[0_24px_70px_-32px_rgba(220,21,55,0.45)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_32px_90px_-36px_rgba(220,21,55,0.55)] sm:p-8 lg:p-10 lg:gap-12">
       <div className={`absolute -inset-2 -z-10 ${frame.accent} rounded-[44px] opacity-60 blur-sm transition-transform duration-500 group-hover:rotate-1`} />
 
-      <div className="relative mb-7">
+      <div className="relative mb-7 lg:mb-0 lg:w-2/5 shrink-0">
         <div
           className={`relative z-10 aspect-[4/3] overflow-hidden border-[10px] border-white bg-gray-50 shadow-[0_22px_45px_-24px_rgba(17,24,39,0.55)] transition-transform duration-700 group-hover:rotate-0 ${frame.rotate}`}
           style={{ borderRadius: frame.radius }}
@@ -67,7 +77,7 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
         <StarDoodle className="absolute -right-3 bottom-3 z-20 h-10 w-10 text-rosa-empolvado opacity-80 transition-transform duration-500 group-hover:rotate-12" />
       </div>
 
-      <div className="flex grow flex-col">
+      <div className="flex grow flex-col justify-center">
         <div className="mb-4 flex flex-wrap items-center gap-2">
           {product.category?.nombre && (
             <span
@@ -115,10 +125,10 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:gap-4">
             <Link
               href={detailHref}
-              className="inline-flex min-h-12 items-center justify-center rounded-full bg-coral px-6 py-3 text-center text-sm font-bold text-white shadow-lg shadow-rose-200/60 transition-all hover:bg-coral-dark hover:-translate-y-0.5"
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-coral px-6 py-3 text-center text-sm font-bold text-white shadow-lg shadow-rose-200/60 transition-all hover:bg-coral-dark hover:-translate-y-0.5"
             >
               Ver detalles
             </Link>
@@ -126,7 +136,7 @@ export function FavoriteProductCard({ product, index }: FavoriteProductCardProps
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-coral bg-white px-6 py-3 text-center text-sm font-bold text-coral transition-all hover:bg-rosa-pastel hover:-translate-y-0.5"
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border-2 border-coral bg-white px-6 py-3 text-center text-sm font-bold text-coral transition-all hover:bg-rosa-pastel hover:-translate-y-0.5"
             >
               Consultar
             </a>
