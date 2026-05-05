@@ -55,20 +55,27 @@ export default function ContactPage() {
                         </div>
 
                         {/* Right Column */}
-                        <div className="md:w-1/2 flex justify-center relative mt-16 md:mt-0">
-                            <div className="relative z-10 w-56 md:w-72 lg:w-80">
-                                <Image src="/images/Ricky_saluda.png" alt="Ricky saludando" width={400} height={400} className="w-full h-auto drop-shadow-xl" />
-                            </div>
-                            
-                            {/* Comic Balloon */}
-                            <div className="absolute -top-10 -right-4 md:-top-12 md:-right-8 bg-white border-[4px] border-[#111111] rounded-[28px] p-5 md:p-6 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] max-w-[220px] md:max-w-[260px] z-20">
-                                <p className="text-[#12192C] font-medium text-sm md:text-base leading-snug">
-                                    <span className="text-[#E4072F] font-bold">¡Hola!</span> Estoy acá para ayudarte con pedidos, consultas y personalizados.
-                                </p>
-                                {/* Tail border */}
-                                <div className="absolute -bottom-[12px] left-8 w-6 h-6 border-b-[4px] border-l-[4px] border-[#111111] transform -rotate-45 z-[-1]"></div>
-                                {/* Tail background (covers balloon border) */}
-                                <div className="absolute -bottom-[4px] left-8 w-6 h-6 bg-white transform -rotate-45"></div>
+                        <div className="md:w-1/2 flex justify-center mt-12 md:mt-0">
+                            <div className="relative flex flex-col items-center">
+                                {/* Comic Balloon */}
+                                <div className="relative md:absolute md:-top-4 md:-right-8 lg:-right-12 bg-white border-[4px] border-[#111111] rounded-[28px] p-5 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] w-[240px] md:w-[220px] lg:w-[260px] z-20 mb-6 md:mb-0">
+                                    <p className="text-[#12192C] font-medium text-sm md:text-base leading-snug">
+                                        <span className="text-[#E4072F] font-bold">¡Hola!</span> Estoy acá para ayudarte con pedidos, consultas y personalizados.
+                                    </p>
+                                    
+                                    {/* Tail Mobile */}
+                                    <div className="absolute -bottom-[12px] left-1/2 -translate-x-1/2 md:hidden w-6 h-6 border-b-[4px] border-r-[4px] border-[#111111] transform rotate-45 z-[-1]"></div>
+                                    <div className="absolute -bottom-[4px] left-1/2 -translate-x-1/2 md:hidden w-6 h-6 bg-white transform rotate-45"></div>
+
+                                    {/* Tail Desktop */}
+                                    <div className="hidden md:block absolute -bottom-[12px] left-8 w-6 h-6 border-b-[4px] border-l-[4px] border-[#111111] transform -rotate-45 z-[-1]"></div>
+                                    <div className="hidden md:block absolute -bottom-[4px] left-8 w-6 h-6 bg-white transform -rotate-45"></div>
+                                </div>
+
+                                {/* Ricky Image */}
+                                <div className="relative z-10 w-48 sm:w-52 md:w-56 lg:w-64">
+                                    <Image src="/images/Ricky_saluda.png" alt="Ricky saludando" width={400} height={400} className="w-full h-auto drop-shadow-xl" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -207,7 +214,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
-                    <div className="w-24 md:w-32 flex-shrink-0 relative">
+                    <div className="w-32 md:w-40 lg:w-48 flex-shrink-0 relative">
                         <Image src="/images/Ricky_phone.png" alt="Ricky en el teléfono" width={200} height={200} className="w-full h-auto drop-shadow-lg" />
                     </div>
                     
